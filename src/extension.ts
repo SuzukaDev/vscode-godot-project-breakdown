@@ -1,0 +1,628 @@
+// 'use_strict';
+
+// The module 'vscode' contains the VS Code extensibility API
+// Import the module and reference it with the alias vscode in your code below
+import * as vscode from 'vscode';
+import * as path from 'path';
+import {DocumentInfo} from './DocumentInfo';
+
+import * as fs from 'fs';
+// this method is called when your extension is activated
+// your extension is activated the very first time the command is executed
+export function activate(context: vscode.ExtensionContext) {
+
+	// Use the console to output diagnostic information (console.log) and errors (console.error)
+	// This line of code will only be executed once when your extension is activated
+	console.log('[GodotProjectBreakdown]: Extension activated');
+
+	// The command has been defined in the package.json file
+	// Now provide the implementation of the command with registerCommand
+	// The commandId parameter must match the command field in package.json
+	let disposable = vscode.commands.registerCommand('extension.godotProjectBreakdown', () => {
+		// The code you place here will be executed every time your command is executed
+
+		// Display a message box to the user
+		vscode.window.showInformationMessage('Generating file. Please wait for the magic...');
+		// let test = new DocumentInfo("awerawer","asdfasdfdsfgdfg"); 
+		// let test = new DocumentInfo(vscode.workspace.textDocuments[0], 
+		// 	new vscode.DocumentSymbol("pepe", "pepe",
+		// 	 vscode.SymbolKind.Boolean, 
+		// 	 new vscode.Range(new vscode.Position(10,10), new vscode.Position(102,102)), new vscode.Range(new vscode.Position(20,20), new vscode.Position(10123,10213))
+		// 	 ));
+		// let p = FindFiles();
+
+
+
+		let config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('godotProjectBreakdown');
+		let documentsSeparator: string = DocumentInfo.config.get('separator.scripts') as string;
+		let linesBetweenScripts: number = DocumentInfo.config.get('separator.linesBetweenScripts') as number;
+		let fileName: string = DocumentInfo.config.get('file.name') as string;
+		let fileExtension: string = DocumentInfo.config.get('file.extension') as string;
+		if(!fileExtension.startsWith("."))
+		{
+			fileExtension = "." + fileExtension;
+		}
+		let filePath: string = DocumentInfo.config.get('file.path') as string;
+		let overrideFile: boolean = DocumentInfo.config.get('file.override') as boolean;
+		let scriptsSortType: string = DocumentInfo.config.get('file.sortScriptsBy') as string;
+		
+		
+
+		// FindFiles();
+		GetDocumentInfoArray()
+		.then(function(documentsArray){			
+
+			documentsArray = SortDocuments(documentsArray, scriptsSortType);
+
+			// documentsArray = documentsArray.sort((a,b)=>{
+			// 	if(a.GetFileName().toLowerCase() > b.GetFileName().toLowerCase()){
+			// 		return 1;
+			// 	}
+			// 	if(a.GetFileName().toLowerCase() < b.GetFileName().toLowerCase()){
+			// 		return -1;
+			// 	}
+			// 	return 0;
+			// });
+
+			// let projectBreakdown = "";
+			let projectBreakdown = GetDocumentHeader([vscode.workspace.rootPath, documentsArray.length]);
+
+
+			//if file is not set to override, generates a new file
+			if(!overrideFile) 
+			{		
+				fileName = GetUniqueName(fileName);				
+			}
+
+			/*
+			let rtrn = "\n";
+			let i = 0;
+			documentsArray.forEach(doc => {
+				vscode.window.setStatusBarMessage('Completed: '+ ((i/documentsArray.length)*100).toString());
+				i++;
+				// console.log(i);
+				// console.log('Completed: '+ ((i/documentsArray.length)*100).toString());
+				projectBreakdown += doc.PrintDocument();
+				projectBreakdown += documentsSeparator + "\n".repeat(linesBetweenScripts + 1);				
+			});
+			*/
+
+			for (let i = 0; i < documentsArray.length; i++) {
+				const doc = documentsArray[i];
+				vscode.window.setStatusBarMessage('Completed: '+ ((i/documentsArray.length)*100).toString());
+				i++;
+				// console.log(i);
+				// console.log('Completed: '+ ((i/documentsArray.length)*100).toString());
+				projectBreakdown += doc.PrintDocument();
+				projectBreakdown += documentsSeparator + "\n".repeat(linesBetweenScripts + 1);
+			}
+
+
+			vscode.window.setStatusBarMessage('Writing file...');
+
+			// console.log(documentsArray);
+			// console.log(projectBreakdown);
+			// documentsArray[0].GetInstanceVariables();
+			// documentsArray[0].PrintInstanceVariables();
+			// documentsArray[0].GetMethods();
+			// documentsArray[0].PrintDocument();
+
+
+
+			// let workspaceFolder: string = '';
+			// if (vscode.workspace.workspaceFolders !== undefined) {
+			// 	workspaceFolder = vscode.workspace.workspaceFolders[0].uri.path;
+			// }
+			// const newFile = vscode.Uri.parse('untitled:' + path.join(workspaceFolder, 'safsa.txt'));
+			// console.error("vscode.workspace.rootPath  - " + vscode.workspace.rootPath );
+			// console.error("vscode.workspace.rootPath|| './'  - " + vscode.workspace.rootPath|| "./" );
+			// console.error("vscode.workspace.rootPath|| './' + filePath - " + (vscode.workspace.rootPath|| "./") + filePath );
+			// console.error("filePath - " + filePath );
+			// const newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath || "./", 'file.dat'),true);
+			// const newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath || "./" + filePath , fileName),true);
+			// const newFile = vscode.Uri.parse(path.join(vscode.workspace.rootPath || "./" + filePath , fileName),true);
+			
+			// NOTE asi estaba originalmente
+			const newFile = vscode.Uri.parse('untitled:' + path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
+
+			// let newFile = vscode.Uri.parse('untitled:' + path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
+			// let newFile = vscode.Uri.file('untitled:' + path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension));
+			// let newFile = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
+
+			// console.log("newFile: " + newFile );
+
+			if (fs.existsSync(newFile.path))
+			{
+				// console.error("EL ARCHIVO YA EXISTE");
+				// // newFile = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
+				// const edit2 = new vscode.WorkspaceEdit();
+				// edit2.deleteFile(newFile);
+				// vscode.workspace.applyEdit(edit2).then(success => {
+				// 	CreateNewDocument(newFile, projectBreakdown);
+				// });
+
+				// console.log("The file exists");
+				var filePath2 = path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension);
+				fs.writeFileSync(filePath2, projectBreakdown, 'utf8');
+				// console.log("After writing");
+
+				const newFilee = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
+				// vscode.window.showTextDocument(newFile);
+				vscode.window.showTextDocument(vscode.Uri.file(newFile.path));
+				// vscode.window.showTextDocument(newFilee);
+				vscode.window.showInformationMessage("File "+fileName+fileExtension+ " modified!");
+
+				vscode.window.setStatusBarMessage('');
+
+			}
+			else
+			{
+				// console.log("The file DONT exists");
+			// console.log("newFile: " + newFile );
+// TODO 
+// HERE
+			// if(overrideFile)
+			// {
+			// 	if(1==1)
+			// 	{
+			// 		if (fs.existsSync(newFile.path))
+			// 		{
+			// 			console.error("EL ARCHIVO YA EXISTE");
+			// 		}
+			// 	}
+			// }
+
+				// NOTE ESTO ORIGNAL
+				vscode.workspace.openTextDocument(newFile).then(document => {
+					const edit = new vscode.WorkspaceEdit();
+					edit.insert(newFile, new vscode.Position(0, 0), projectBreakdown);
+					return vscode.workspace.applyEdit(edit).then(success => {
+						if (success) {
+							vscode.window.showTextDocument(document);
+							vscode.window.showInformationMessage("File "+fileName+fileExtension+ " created!");
+
+						} else {
+							vscode.window.showInformationMessage('Error!');
+						}
+						vscode.window.setStatusBarMessage('');
+					});
+				});
+
+			}
+
+
+
+
+
+			// documentsArray[0].GetSignals();
+			// documentsArray[0].PrintSignals();
+			// for(const doc of documentsArray)
+			// {
+			// 	doc.Print("");
+			// }
+
+
+			// vscode.window.setStatusBarMessage('');
+
+		});
+
+
+		// https://stackoverflow.com/questions/43359528/javascript-async-await-not-working
+		// FindFiles().then(() => {
+		// 	test.Print("HEHEHEHEH");
+		// });
+		// test.Print("HEHEHEHEH");
+	});
+
+	context.subscriptions.push(disposable);
+}
+
+
+
+// function GetDocumentHeader(params:[]):string
+// function GetDocumentHeader(...params: any[]):string
+function GetDocumentHeader(params: any[]):string
+{
+
+	let workspace = params[0];
+	let nScripts = params[1];
+	let date = new Date();	
+	let mins = ('0'+date.getMinutes()).slice(-2);
+
+
+	let headerText = "Project Breakdown";	
+	let dateText = date.toLocaleDateString()+"   "+date.getHours() +":"+ mins;
+	let scriptsText = "Total Scripts: "+ nScripts;
+	let offset = 5;
+	let maxSize = Math.max(headerText.length, dateText.length, scriptsText.length, workspace.length) + offset;
+
+	let prefix = "|";
+	let sufix = "|";
+	
+	let centerHeader = CenterString(headerText, maxSize);
+	let centerWorkspace = CenterString(workspace, maxSize);
+	let centerDateText = CenterString(dateText, maxSize);
+	let centerScript = CenterString(scriptsText, maxSize);
+	
+	let min = Math.min(centerDateText.length,centerHeader.length, centerWorkspace.length, centerScript.length);
+	
+
+
+
+
+
+	return "_".repeat(maxSize)+"\n"+
+	// prefix + CenterString(headerText, maxSize)+sufix+"\n"+
+	// prefix + CenterString(workspace, maxSize)+sufix+"\n"+
+	// prefix + CenterString(dateText, maxSize)+sufix+"\n"+
+	// prefix + CenterString(scriptsText, maxSize)+sufix+"\n"+
+
+	// prefix + centerHeader+sufix+"\n"+
+	// prefix + centerWorkspace+sufix+"\n"+
+	// prefix + centerDateText+sufix+"\n"+
+	// prefix + centerScript+sufix+"\n"+
+
+	// prefix + centerHeader+"\n"+
+	// prefix + centerWorkspace+"\n"+
+	// prefix + centerDateText+"\n"+
+	// prefix + centerScript+"\n"+
+
+	prefix + centerHeader.substring(0,min)+sufix+"\n"+
+	prefix + centerWorkspace.substring(0,min)+sufix+"\n"+
+	prefix + centerDateText.substring(0,min)+sufix+"\n"+
+	prefix + centerScript.substring(0,min)+sufix+"\n"+
+
+
+
+	// prefix + "·".repeat(maxSize)+"\n".repeat(5);
+	// "·".repeat(maxSize)+"\n".repeat(5);
+	"└"+"·".repeat(maxSize-1)+"┘"+"\n".repeat(5);
+
+
+}
+
+
+
+function CenterString(text:string, len:number):string
+{
+	if (len <= text.length)
+		return text.substring(0, len);
+	let before = (len - text.length)/2;
+	if (before == 0)
+		return " ".repeat(before)+text+" ".repeat(before);
+	return " ".repeat(before)+text+" ".repeat(before);
+}
+
+function GetUniqueName(originalName: string): string
+{
+	let date = new Date();
+	let components = [
+		date.getFullYear(),
+		date.getMonth(),
+		date.getDate(),
+		date.getHours(),
+		date.getMinutes(),
+		date.getSeconds(),
+		date.getMilliseconds()
+	];
+	// let id = components.join("");											
+	// return components.join("");		
+	return originalName + " " + components.join("");				
+
+	// fileName = fileName + " " + id;		
+}
+
+function SortDocuments(documents: DocumentInfo[], sortType: string)
+{
+	documents = documents.sort((a,b)=>{
+
+
+		let aa:string = "";
+		let bb:string = "";
+
+		switch (sortType) {
+			case "name":
+				aa = a.GetFileName().toLowerCase();
+				bb = b.GetFileName().toLowerCase();
+				break;
+			case "path":
+				aa = a.GetFilePath().toLowerCase();
+				bb = b.GetFilePath().toLowerCase();
+				break;
+			case "extends":
+				aa = a.GetExtend().toLowerCase();
+				bb = b.GetExtend().toLowerCase();
+				break;
+		
+			default:
+				break;
+		}
+
+
+		// TODO if there is a reverse option.... changes aa and bb previously
+
+		if(aa > bb){
+			return 1;
+		}
+		if(aa < bb){
+			return -1;
+		}
+		return 0;
+	});
+
+	return documents;
+}
+
+function CreateNewDocument(fileUri: vscode.Uri, textInDocument:string)
+{
+	vscode.workspace.openTextDocument(fileUri).then(document => {
+		const edit = new vscode.WorkspaceEdit();
+		edit.insert(fileUri, new vscode.Position(0, 0), textInDocument);
+		return vscode.workspace.applyEdit(edit).then(success => {
+			if (success) {
+				vscode.window.showTextDocument(document);
+			} else {
+				vscode.window.showInformationMessage('Error!');
+			}
+		});
+	});
+}
+
+
+// this method is called when your extension is deactivated
+export function deactivate() {}
+
+
+
+
+
+// ESTO ERA UN TEST PARA APRENDER
+// function FindFiles(){
+async function FindFiles(){
+	vscode.window.showInformationMessage('FIND FILES!');
+
+	console.log("SOY FIND FILES");
+	// vscode.workspace.findFiles('*.gd');
+	// let filesPromise = vscode.workspace.findFiles('*.gd');
+	//TODO el glob pattern tiene toda la pinta de que tengo que hacerlo una variable del workspace
+	// https://github.com/ev3dev/vscode-ev3dev-browser/wiki/Glob-Patterns
+	// https://stackoverflow.com/questions/46589598/how-to-search-for-just-a-specific-file-type-in-visual-studio-code	
+	// let filesPromise = vscode.workspace.findFiles('*.{gd,cpp}'); 
+	// let filesPromise = vscode.workspace.findFiles('**/*.{gd,cpp}'); //match all files, including those in ANY SUBDIRECTORY
+	let filesPromise = vscode.workspace.findFiles('**/*.{gd}'); //match all files, including those in ANY SUBDIRECTORY
+
+	filesPromise.then(function(value) {
+		console.log("=======THEN:======")
+		console.log(value);
+		value.forEach(file => {
+			console.log(file.path);
+		});
+		// expected output: 123
+	  });
+
+	// console.log(vscode.workspace.workspaceFolders);
+
+	// vscode.workspace.workspaceFolders.forEach(e => {
+	// 	console.log(e.name);
+	// 	console.log(e.uri);
+	// 	console.log("----------");
+		
+	// });
+
+	vscode.workspace.textDocuments.forEach(e => {
+		console.log(e.fileName);
+		console.log(e.uri);
+		console.log(e.languageId);
+		console.log("----------");
+		
+	});
+
+
+
+
+	//TEST coger simbolos de 1 documento
+	// let testDocument = 
+	// esto tiene las uris de los documentos
+	filesPromise.then(function(textDocuments) {
+		console.log("THEN numero 2!!!!!!! (Path del Documento[0]:");
+		// RESOURCE IDENTIFIER (URI)
+		console.log(textDocuments[0].path);
+		// console.log(textDocuments[0].fsPath);
+
+		// vscode.workspace.openTextDocument(textDocuments[0].path).then(function(aTextDocument){
+		vscode.workspace.openTextDocument(textDocuments[0].path).then(async function(aTextDocument){
+			console.log("Estoy en el THEN (ABRIENDO EL DOCUMENTO)");
+			console.log(aTextDocument.fileName);
+			// result.fileName
+			// https://code.visualstudio.com/api/references/commands
+			// vscode.executeDocumentSymbolProvider -> (returns) - A promise that resolves to an array of SymbolInformation and DocumentSymbol instances.
+			/*
+			let symbolsPromise = vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', aTextDocument.uri);
+			
+			symbolsPromise.then(function(theSymbols){
+			// symbolsPromise.then(function(theSymbols: vscode.SymbolInformation[]){
+			// symbolsPromise.then(function(theSymbols: vscode.SymbolInformation[]){
+				console.log("HE OBTENIDO LOS SIMBOLOS");
+				theSymbols.forEach(symb => {
+					//symbol Information
+					// https://code.visualstudio.com/api/references/vscode-api#SymbolInformation
+					// console.log(symb.name +"\tKind: "+ symb.kind + "\tContainer name:" + symb.containerName + "\tLocation"+symb.location);
+
+					// DocumenSymbol
+					// https://code.visualstudio.com/api/references/vscode-api#DocumentSymbol
+					// console.log(symb.name +"\tKind: "+ symb.kind + "\tContainer name:" + symb.containerName + "\tLocation"+symb.location);
+					console.log(symb);
+				});
+			});
+			*/
+
+
+			console.log("EOOOO???");
+			// https://github.com/search?q=vscode.commands.executeCommand%28%27vscode.executeDocumentSymbolProvider%27%2C&type=Code
+			// let symbolsPromise = vscode.commands.executeCommand<vscode.SymbolInformation[]>('vscode.executeDocumentSymbolProvider', aTextDocument.uri);
+			let symbolsPromise = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', aTextDocument.uri) as vscode.SymbolInformation[];
+			// NOTE ya no es una promesa, al hacer el await, ahora tengo los symbolos
+			let j = 0;
+			symbolsPromise.forEach(symb => {
+				console.log("IMPRIMO SIMBOLO "+j++);
+			});
+
+
+			
+			
+
+			// https://developer.mozilla.org/es/docs/Web/JavaScript/Guide/Usar_promesas
+			// symbolsPromise.then(nuevoResultado[]: vscode.SymbolInformation => TestPromise(nuevoResultado));
+
+
+			// console.log(symbols);
+			// vscode.DocumentSybolProvider.
+			// vscode.provideDocumentSymbols()
+		});
+	});
+
+	// TODO
+	// DocumentInfo tt = new DocumentInfo(null, null);
+	// let doc = new DocumentInfo(null, null);
+}
+
+
+function TestPromise(arraySymbols: vscode.SymbolInformation[])
+// function TestPromise(arraySymbols)
+{
+	arraySymbols.forEach(symbol => {
+		console.log(symbol);
+	});
+}
+
+
+
+
+
+// Promises.all
+// https://stackoverflow.com/questions/38362231/how-to-use-promise-in-foreach-loop-of-array-to-populate-an-object/38362312
+
+
+
+
+
+
+
+
+
+
+
+/*
+PROCEDURE:
+1º Find files
+2º For each file, get symbols
+3º Create an array of DocumentInfo objects (DocumentInfo stores the document and its symbols)
+4º Iterate on the DocumentInfo objects arrays and extract an STRING of its text, and concatenate with the rest of DocumentInfo objects (adding a custom separation between objects/files)
+5º Create new file and add the STRING to the file
+
+
+
+GetDocumentInfoArray
+
+*/
+
+// function GetDocumentInfoArray(): DocumentInfo[]
+// async function GetDocumentInfoArray()
+// {
+// 	// let documentsInfoArray: DocumentInfo[];
+
+// 	let documentsInfoArray: Array<DocumentInfo>;
+// 	// TODO cambiar el glob pattern de abajo por una variable
+// 	let filesUri: vscode.Uri[] = await vscode.workspace.findFiles('**/*.{gd}');
+// 	filesUri.forEach(async anUri => {
+// 		// let doc: vscode.TextDocument = vscode.workspace.openTextDocument(anUri).then(async function(theDocument){
+// 		const theDocument = await vscode.workspace.openTextDocument(anUri);
+// 		// return theDocument;
+// 		//Get the symbols from the document
+// 		let docSymbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];
+// 		let docInfo: DocumentInfo = new DocumentInfo(theDocument, docSymbols);
+// 		// Adds the object to the array
+// 		documentsInfoArray.push(docInfo);
+// 		console.log("-ADDED TO ARRAY-");
+// 	});
+
+// 	console.log("GetDocumentInfoArray END =======================================================================")
+// 	// console.log(documentsInfoArray);
+// 	// return documentsInfoArray;
+
+// }
+
+
+async function GetDocumentInfoArray() :Promise<DocumentInfo[]>
+{	
+	// let documentsInfoArray: DocumentInfo[];
+	// let documentsInfoArray: Array<DocumentInfo>;
+	let documentsInfoArray: DocumentInfo[] = [];
+
+	// TODO cambiar el glob pattern de abajo por una variable
+	let filesUri: vscode.Uri[] = await vscode.workspace.findFiles('**/*.{gd}');
+
+	// console.log(filesUri);
+	// let promises: Array<Promise>;
+	// let promises: Promises[];
+
+
+	let promises: Promise<void>[] = [];
+
+	// let p = new Promise(function(resolve, reject){
+	// 	resolve("caca");
+	// });
+
+	// p.then(function(fromResolve){
+	// 	console.log("texto from resolve: "+fromResolve);
+	// });
+
+
+
+	// POR FIN: Aqui el problema 
+	// https://stackoverflow.com/questions/37576685/are-there-any-issues-with-using-async-await-in-a-foreach-loop
+	// filesUri.forEach(async anUri => {
+
+	for (const anUri of filesUri) {
+
+
+
+
+		// console.log(anUri.path);
+		// let doc: vscode.TextDocument = vscode.workspace.openTextDocument(anUri).then(async function(theDocument){
+		const theDocument = await vscode.workspace.openTextDocument(anUri);
+		// console.log(theDocument.fileName);
+		// return theDocument;
+		//Get the symbols from the document
+		// let docSymbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];
+
+
+		// let docSymbols = vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', theDocument.uri);
+		// docSymbols.then(function(symbols){
+		// 	console.log("docSymbolsçççççççççççççççççççççççççççççççççççççççççççççççççççççççççççççç");
+		// 	let docInfo: DocumentInfo = new DocumentInfo(theDocument, symbols as vscode.DocumentSymbol[]);
+		// 	documentsInfoArray.push(docInfo);
+		// 	console.log("-ADDED TO ARRAY-");
+		// });
+
+
+		let docSymbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];
+		let docInfo: DocumentInfo = new DocumentInfo(theDocument, docSymbols);
+		documentsInfoArray.push(docInfo);
+
+
+		// Adds the object to the array
+		// console.log("-ADDED TO ARRAYYYYYYYYYY- " + theDocument.fileName);		
+	// });
+	}
+
+
+	// Promise.all(promises){
+	// 	console.log("TODAS LAS PROMESAS SE HAN COMPLETADO");
+	// };
+
+	// console.log("GetDocumentInfoArray END =======================================================================")
+	// console.log(documentsInfoArray);
+	// return documentsInfoArray;
+	return documentsInfoArray;
+}

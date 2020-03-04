@@ -1,0 +1,171 @@
+{
+	"name": "godotProjectBreakdown",
+	"displayName": "godotProjectBreakdown",
+	"description": "Extension for generating a file containing a breakdown of the project, with all scripts and their variables, methods, signals, node references, etc.",
+	"version": "0.0.1",
+	"engines": {
+		"vscode": "^1.41.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"activationEvents": [
+		"onCommand:extension.godotProjectBreakdown"
+	],
+	"main": "./out/extension.js",
+	"extensionDependencies": ["geequlim.godot-tools"],
+	"contributes": {
+		"commands": [
+			{
+				"command": "extension.godotProjectBreakdown",
+				"title": "GodotProjectBreakdown: Generate Breakdown File"
+			}
+		],
+		"configuration": {
+
+			"title": "godotProjectBreakdown",
+			"properties": {
+
+				"godotProjectBreakdown.file.order": {					
+					"type": "string",
+					"default": "fp nsvm",
+					"description": "The order of the document:\nn - Node references\ns - Signals\nv - Variables\nm - Methods\np - Path of the file\nf - File Name\n(Empty space) - Line separation (\\n)"
+				},
+				"godotProjectBreakdown.file.sortScriptsBy": {					
+					"type": "string",
+					"default": "path",
+					"enum": ["path", "name", "extends"],
+					"enumDescriptions": [
+					"Short the scripts by their path",
+					"Short the scripts by their name",					
+					"Short the scripts by extended node/script"					
+					]
+				},
+
+
+
+				"godotProjectBreakdown.file.name": {					
+					"type": "string",
+					"default": "Project Breakdown",
+					"description": "Name for the generated document."
+				},
+				"godotProjectBreakdown.file.extension": {					
+					"type": "string",
+					"default": ".txt",
+					"description": "File extension for the generated document (by default, .txt)"
+				},
+				"godotProjectBreakdown.file.path": {					
+					"type": "string",
+					"default": "",
+					"description": "Path relative to the workspace (set it to empty to put it in the same folder as workspace)."
+				},
+				"godotProjectBreakdown.file.override": {					
+					"type": "boolean",
+					"default": "true",
+					"description": "If false, generates an unique name and avoids orverwriting a previous file."
+				},
+				"godotProjectBreakdown.file.showConstants": {					
+					"type": "boolean",
+					"default": "true",
+					"description": "If true, shows the constants with the variables"
+				},
+
+
+
+				
+				"godotProjectBreakdown.separator.nodeReferences": {					
+					"type": "string",
+					"default": "· · · · · · · · · Nodes · · · · · · · · · · · ",
+					"description": "Text/separation printed before the referenced nodes"
+				},
+				"godotProjectBreakdown.separator.signals": {					
+					"type": "string",
+					"default": "- - - - - - - - - Signals - - - - - - - - - - ",
+					"description": "Text/separation printed before the signals"
+				},
+				"godotProjectBreakdown.separator.variables": {					
+					"type": "string",
+					"default": "..................Variables..................",
+					"description": "Text/separation printed before the variables"
+				},
+				"godotProjectBreakdown.separator.methods": {					
+					"type": "string",
+					"default": "___________________Methods___________________",
+					"description": "Text/separation printed before the method"
+				},
+				"godotProjectBreakdown.separator.scripts": {					
+					"type": "string",
+					"default": "==============================================================================",
+					"description": "Separation between scripts"
+				},
+				"godotProjectBreakdown.separator.linesBetweenScripts": {					
+					"type": "number",
+					"default": 3, 
+					"minimum": 0,
+					"maximum": 50,
+					"description": "Lines of separation between scripts in the generated file."
+				},
+
+				"godotProjectBreakdown.separator.publicAndPrivateVariables": {					
+					"type": "boolean",
+					"default": "true",
+					"description": "Adds a space between public and private variables"
+				},
+				"godotProjectBreakdown.separator.publicAndPrivateMethods": {					
+					"type": "boolean",
+					"default": "true",
+					"description": "Adds a space between public and private methods"
+				},
+
+				"godotProjectBreakdown.prefix.signals": {					
+					"type": "string",
+					"default": "s: ", 
+					"minimum": 0,
+					"maximum": 50,
+					"description": "Prefix used for each signal"
+				},
+				"godotProjectBreakdown.prefix.nodeReferences": {					
+					"type": "string",
+					"default": "node: ", 
+					"description": "Prefix used for each node reference"
+				},
+				"godotProjectBreakdown.prefix.variables": {					
+					"type": "string",
+					"default": "\t", 
+					"description": "Prefix used for each variable"
+				},
+				"godotProjectBreakdown.prefix.constants": {					
+					"type": "string",
+					"default": "const ", 
+					"description": "Prefix used for each constant"
+				},
+				"godotProjectBreakdown.prefix.methods": {					
+					"type": "string",
+					"default": "", 
+					"description": "Prefix used for each method"
+				}
+
+
+
+			  }
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"watch": "tsc -watch -p ./",
+		"pretest": "npm run compile",
+		"test": "node ./out/test/runTest.js"
+	},
+	"devDependencies": {
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^5.2.7",
+		"@types/node": "^12.11.7",
+		"@types/vscode": "^1.41.0",
+		"glob": "^7.1.5",
+		"mocha": "^6.2.2",
+		"typescript": "^3.6.4",
+		"tslint": "^5.20.0",
+		"vscode-test": "^1.2.2"
+	}
+}
