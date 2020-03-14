@@ -5,22 +5,9 @@
 import * as vscode from 'vscode';
 import * as path from 'path';
 import {DocumentInfo} from './DocumentInfo';
-
 import * as fs from 'fs';
 
-
-
-
-
-
-
-
-
 let hasFinished:boolean = false;
-
-
-
-
 
 
 
@@ -69,8 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		
 		progress.report({ increment: 15, message: "Getting .gd files" });
-
-		// FindFiles();
+		
 		GetDocumentInfoArray()
 		.then(function(documentsArray){			
 			documentsArray = SortDocuments(documentsArray, scriptsSortType);	
@@ -111,8 +97,6 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showTextDocument(vscode.Uri.file(newFile.path));
 				vscode.window.setStatusBarMessage('');
 				progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " modified!" });
-
-				hasFinished = true;				
 			}
 			else
 			{
@@ -129,14 +113,12 @@ export function activate(context: vscode.ExtensionContext) {
 							vscode.window.showInformationMessage('Error!');
 						}
 						vscode.window.setStatusBarMessage('');
-
-						hasFinished = true;
 					});
 				});
 
 			}
 
-			// hasFinished = true;
+			hasFinished = true;
 			
 		});
 
@@ -155,14 +137,9 @@ export function activate(context: vscode.ExtensionContext) {
 			// return p;
 
 
-
-			return ensureHasFinished();
+			return EnsureHasFinished();
 			// return ensureHasFinished(progress);
 			// return ensureHasFinished(hasFinished);
-
-
-
-
 
 		});
 
@@ -172,33 +149,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	});
 
-
-
-
-
-
-
-
 	context.subscriptions.push(disposable);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
+
+
+// this method is called when your extension is deactivated
+export function deactivate() {}
 
 
 // https://stackoverflow.com/questions/30505960/use-promise-to-wait-until-polled-condition-is-satisfied
@@ -273,7 +229,7 @@ function v1ensureHasFinished() {
 
 
 // https://stackoverflow.com/questions/30505960/use-promise-to-wait-until-polled-condition-is-satisfied
-function ensureHasFinished() 
+function EnsureHasFinished() 
 {
 	let time = 5
     return new Promise(function (resolve, reject) {
@@ -297,28 +253,7 @@ function ensureHasFinished()
 }
 
 
-// function ensureHasFinished(variableToCheck:boolean) {
-//     return new Promise(function (resolve, reject) {
-//         (function waitForFoo(){
-// 			if (variableToCheck) 
-// 			{
-// 				console.log("WAIT 5s to resolve");
-// 				setTimeout(()=>{
-// 					return resolve();
-// 				}, 5000);
-// 			}
-//             setTimeout(waitForFoo, 30);
-//         })();
-//     });
-// }
 
-
-
-
-
-
-// function GetDocumentHeader(params:[]):string
-// function GetDocumentHeader(...params: any[]):string
 function GetDocumentHeader(params: any[]):string
 {
 
@@ -523,260 +458,23 @@ function CreateNewDocument(fileUri: vscode.Uri, textInDocument:string)
 }
 
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
-
-
-
-
-
-// ESTO ERA UN TEST PARA APRENDER
-// function FindFiles(){
-async function FindFiles(){
-	vscode.window.showInformationMessage('FIND FILES!');
-
-	console.log("SOY FIND FILES");
-	// vscode.workspace.findFiles('*.gd');
-	// let filesPromise = vscode.workspace.findFiles('*.gd');
-	//TODO el glob pattern tiene toda la pinta de que tengo que hacerlo una variable del workspace
-	// https://github.com/ev3dev/vscode-ev3dev-browser/wiki/Glob-Patterns
-	// https://stackoverflow.com/questions/46589598/how-to-search-for-just-a-specific-file-type-in-visual-studio-code	
-	// let filesPromise = vscode.workspace.findFiles('*.{gd,cpp}'); 
-	// let filesPromise = vscode.workspace.findFiles('**/*.{gd,cpp}'); //match all files, including those in ANY SUBDIRECTORY
-	let filesPromise = vscode.workspace.findFiles('**/*.{gd}'); //match all files, including those in ANY SUBDIRECTORY
-
-	filesPromise.then(function(value) {
-		console.log("=======THEN:======")
-		console.log(value);
-		value.forEach(file => {
-			console.log(file.path);
-		});
-		// expected output: 123
-	  });
-
-	// console.log(vscode.workspace.workspaceFolders);
-
-	// vscode.workspace.workspaceFolders.forEach(e => {
-	// 	console.log(e.name);
-	// 	console.log(e.uri);
-	// 	console.log("----------");
-		
-	// });
-
-	vscode.workspace.textDocuments.forEach(e => {
-		console.log(e.fileName);
-		console.log(e.uri);
-		console.log(e.languageId);
-		console.log("----------");
-		
-	});
-
-
-
-
-	//TEST coger simbolos de 1 documento
-	// let testDocument = 
-	// esto tiene las uris de los documentos
-	filesPromise.then(function(textDocuments) {
-		console.log("THEN numero 2!!!!!!! (Path del Documento[0]:");
-		// RESOURCE IDENTIFIER (URI)
-		console.log(textDocuments[0].path);
-		// console.log(textDocuments[0].fsPath);
-
-		// vscode.workspace.openTextDocument(textDocuments[0].path).then(function(aTextDocument){
-		vscode.workspace.openTextDocument(textDocuments[0].path).then(async function(aTextDocument){
-			console.log("Estoy en el THEN (ABRIENDO EL DOCUMENTO)");
-			console.log(aTextDocument.fileName);
-			// result.fileName
-			// https://code.visualstudio.com/api/references/commands
-			// vscode.executeDocumentSymbolProvider -> (returns) - A promise that resolves to an array of SymbolInformation and DocumentSymbol instances.
-			/*
-			let symbolsPromise = vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', aTextDocument.uri);
-			
-			symbolsPromise.then(function(theSymbols){
-			// symbolsPromise.then(function(theSymbols: vscode.SymbolInformation[]){
-			// symbolsPromise.then(function(theSymbols: vscode.SymbolInformation[]){
-				console.log("HE OBTENIDO LOS SIMBOLOS");
-				theSymbols.forEach(symb => {
-					//symbol Information
-					// https://code.visualstudio.com/api/references/vscode-api#SymbolInformation
-					// console.log(symb.name +"\tKind: "+ symb.kind + "\tContainer name:" + symb.containerName + "\tLocation"+symb.location);
-
-					// DocumenSymbol
-					// https://code.visualstudio.com/api/references/vscode-api#DocumentSymbol
-					// console.log(symb.name +"\tKind: "+ symb.kind + "\tContainer name:" + symb.containerName + "\tLocation"+symb.location);
-					console.log(symb);
-				});
-			});
-			*/
-
-
-			console.log("EOOOO???");
-			// https://github.com/search?q=vscode.commands.executeCommand%28%27vscode.executeDocumentSymbolProvider%27%2C&type=Code
-			// let symbolsPromise = vscode.commands.executeCommand<vscode.SymbolInformation[]>('vscode.executeDocumentSymbolProvider', aTextDocument.uri);
-			let symbolsPromise = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', aTextDocument.uri) as vscode.SymbolInformation[];
-			// NOTE ya no es una promesa, al hacer el await, ahora tengo los symbolos
-			let j = 0;
-			symbolsPromise.forEach(symb => {
-				console.log("IMPRIMO SIMBOLO "+j++);
-			});
-
-
-			
-			
-
-			// https://developer.mozilla.org/es/docs/Web/JavaScript/Guide/Usar_promesas
-			// symbolsPromise.then(nuevoResultado[]: vscode.SymbolInformation => TestPromise(nuevoResultado));
-
-
-			// console.log(symbols);
-			// vscode.DocumentSybolProvider.
-			// vscode.provideDocumentSymbols()
-		});
-	});
-
-	// TODO
-	// DocumentInfo tt = new DocumentInfo(null, null);
-	// let doc = new DocumentInfo(null, null);
-}
-
-
-function TestPromise(arraySymbols: vscode.SymbolInformation[])
-// function TestPromise(arraySymbols)
-{
-	arraySymbols.forEach(symbol => {
-		console.log(symbol);
-	});
-}
-
-
-
-
-
-// Promises.all
-// https://stackoverflow.com/questions/38362231/how-to-use-promise-in-foreach-loop-of-array-to-populate-an-object/38362312
-
-
-
-
-
-
-
-
-
-
-
-/*
-PROCEDURE:
-1º Find files
-2º For each file, get symbols
-3º Create an array of DocumentInfo objects (DocumentInfo stores the document and its symbols)
-4º Iterate on the DocumentInfo objects arrays and extract an STRING of its text, and concatenate with the rest of DocumentInfo objects (adding a custom separation between objects/files)
-5º Create new file and add the STRING to the file
-
-
-
-GetDocumentInfoArray
-
-*/
-
-// function GetDocumentInfoArray(): DocumentInfo[]
-// async function GetDocumentInfoArray()
-// {
-// 	// let documentsInfoArray: DocumentInfo[];
-
-// 	let documentsInfoArray: Array<DocumentInfo>;
-// 	// TODO cambiar el glob pattern de abajo por una variable
-// 	let filesUri: vscode.Uri[] = await vscode.workspace.findFiles('**/*.{gd}');
-// 	filesUri.forEach(async anUri => {
-// 		// let doc: vscode.TextDocument = vscode.workspace.openTextDocument(anUri).then(async function(theDocument){
-// 		const theDocument = await vscode.workspace.openTextDocument(anUri);
-// 		// return theDocument;
-// 		//Get the symbols from the document
-// 		let docSymbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];
-// 		let docInfo: DocumentInfo = new DocumentInfo(theDocument, docSymbols);
-// 		// Adds the object to the array
-// 		documentsInfoArray.push(docInfo);
-// 		console.log("-ADDED TO ARRAY-");
-// 	});
-
-// 	console.log("GetDocumentInfoArray END =======================================================================")
-// 	// console.log(documentsInfoArray);
-// 	// return documentsInfoArray;
-
-// }
-
 
 async function GetDocumentInfoArray() :Promise<DocumentInfo[]>
 {	
-	// let documentsInfoArray: DocumentInfo[];
-	// let documentsInfoArray: Array<DocumentInfo>;
-	let documentsInfoArray: DocumentInfo[] = [];
-
-	// TODO cambiar el glob pattern de abajo por una variable
+	let documentsInfoArray: DocumentInfo[] = [];	
 	let filesUri: vscode.Uri[] = await vscode.workspace.findFiles('**/*.{gd}');
 
-	// console.log(filesUri);
-	// let promises: Array<Promise>;
-	// let promises: Promises[];
-
-
-	let promises: Promise<void>[] = [];
-
-	// let p = new Promise(function(resolve, reject){
-	// 	resolve("caca");
-	// });
-
-	// p.then(function(fromResolve){
-	// 	console.log("texto from resolve: "+fromResolve);
-	// });
-
-
-
-	// POR FIN: Aqui el problema 
+	// Problem with foreach loop and async!
 	// https://stackoverflow.com/questions/37576685/are-there-any-issues-with-using-async-await-in-a-foreach-loop
 	// filesUri.forEach(async anUri => {
 
 	for (const anUri of filesUri) {
-
-
-
-
-		// console.log(anUri.path);
-		// let doc: vscode.TextDocument = vscode.workspace.openTextDocument(anUri).then(async function(theDocument){
 		const theDocument = await vscode.workspace.openTextDocument(anUri);
-		// console.log(theDocument.fileName);
-		// return theDocument;
-		//Get the symbols from the document
-		// let docSymbols = await vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];
-
-
-		// let docSymbols = vscode.commands.executeCommand('vscode.executeDocumentSymbolProvider', theDocument.uri);
-		// docSymbols.then(function(symbols){
-		// 	console.log("docSymbolsçççççççççççççççççççççççççççççççççççççççççççççççççççççççççççççç");
-		// 	let docInfo: DocumentInfo = new DocumentInfo(theDocument, symbols as vscode.DocumentSymbol[]);
-		// 	documentsInfoArray.push(docInfo);
-		// 	console.log("-ADDED TO ARRAY-");
-		// });
-
 
 		let docSymbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];
 		let docInfo: DocumentInfo = new DocumentInfo(theDocument, docSymbols);
 		documentsInfoArray.push(docInfo);
-
-
-		// Adds the object to the array
-		// console.log("-ADDED TO ARRAYYYYYYYYYY- " + theDocument.fileName);		
-	// });
 	}
 
-
-	// Promise.all(promises){
-	// 	console.log("TODAS LAS PROMESAS SE HAN COMPLETADO");
-	// };
-
-	// console.log("GetDocumentInfoArray END =======================================================================")
-	// console.log(documentsInfoArray);
-	// return documentsInfoArray;
 	return documentsInfoArray;
 }
