@@ -20,47 +20,6 @@ let hasFinished:boolean = false;
 
 
 
-// function newTask(step: number): (progress: vscode.Progress<{ message?: string; increment?: number }>, token: vscode.CancellationToken) => Thenable<string> {
-//     return async (progress, token) => {
-//         let count = 100;
-//         await new Promise(resolve => {
-//             let intervalId = setInterval(() => {
-//                 if (count >= 1 && !token.isCancellationRequested) {
-//                     progress.report({
-//                         increment: step,
-//                         message: `${Math.round(count)} task(s) left`
-//                     });
-//                     count = count - step;
-//                     return;
-//                 }
-//                 clearInterval(intervalId);
-//                 resolve(undefined);
-//             }, 100);
-//         });
-//         return "Foo!";
-//     };
-// }
-function newTask(step: number, text:string): (progress: vscode.Progress<{ message?: string; increment?: number }>, token: vscode.CancellationToken) => Thenable<string> {
-    return async (progress, token) => {        
-        await new Promise(resolve => {
-            
-			if (!token.isCancellationRequested && step < 100) {
-				progress.report({
-					increment: step,
-					message: text
-				});
-				// count = count - step;
-				return;
-			}
-			// clearInterval(intervalId);
-			resolve(undefined);            
-        });
-		// return "Foo!";
-		return "";
-    };
-}
-
-
 
 
 
@@ -69,75 +28,6 @@ function newTask(step: number, text:string): (progress: vscode.Progress<{ messag
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-
-
-
-
-
-
-
-
-
-
-	// context.subscriptions.push(vscode.commands.registerCommand('extension.startTask', () => {
-	// 	vscode.window.withProgress({
-	// 		location: vscode.ProgressLocation.Notification,
-	// 		title: "I am long running!",
-	// 		cancellable: true
-	// 	}, (progress, token) => {
-	// 		token.onCancellationRequested(() => {
-	// 			console.log("User canceled the long running operation");
-	// 		});
-
-	// 		progress.report({ increment: 0 });
-
-	// 		setTimeout(() => {
-	// 			progress.report({ increment: 10, message: "I am long running! - still going..." });
-	// 		}, 1000);
-
-	// 		setTimeout(() => {
-	// 			progress.report({ increment: 40, message: "I am long running! - still going even more..." });
-	// 		}, 2000);
-
-	// 		setTimeout(() => {
-	// 			progress.report({ increment: 50, message: "I am long running! - almost there..." });
-	// 		}, 3000);
-
-	// 		var p = new Promise(resolve => {
-	// 			setTimeout(() => {
-	// 				resolve();
-	// 			}, 5000);
-	// 		});
-
-	// 		return p;
-	// 	});
-	// }));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('[GodotProjectBreakdown]: Extension activated');
@@ -147,9 +37,6 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('extension.godotProjectBreakdown', () => {
 
-
-
-
 		vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: "[GodotProjectBreakdown]",
@@ -158,125 +45,16 @@ export function activate(context: vscode.ExtensionContext) {
 		}, (progress, token) => {
 			token.onCancellationRequested(() => {
 				console.log("User canceled the long running operation");
+				hasFinished = true;
+				// return;
 			});
 
+		hasFinished = false;
 
-		// vscode.window.withProgress({
-		// 	location: vscode.ProgressLocation.Notification,
-		// 	title: "Progress test!",
-		// 	cancellable: true
-		// }, (progress, token) => {
-		// 	token.onCancellationRequested(() => {
-		// 		console.log("User canceled the long running operation");
-		// 	});
-
-		// 	progress.report({ increment: 0 });
-
-		// 	setTimeout(() => {
-		// 		progress.report({ increment: 10, message: "I am long running! - still going..." });
-		// 	}, 1000);
-
-		// 	setTimeout(() => {
-		// 		progress.report({ increment: 40, message: "I am long running! - still going even more..." });
-		// 	}, 2000);
-
-		// 	setTimeout(() => {
-		// 		progress.report({ increment: 50, message: "I am long running! - almost there..." });
-		// 	}, 3000);
-
-		// 	var p = new Promise(resolve => {
-		// 		setTimeout(() => {
-		// 			resolve();
-		// 		}, 5000);
-		// 	});
-
-		// 	return p;
-		// });
-
-		// vscode.window.withProgress({ title: "Progressive aggressor 1", location: vscode.ProgressLocation.Notification, cancellable: true }, newTask(0.6, "MIERDA!!!"));
-
-
-
-
-
-		// vscode.window.withProgress({
-		// 	location: vscode.ProgressLocation.Notification,
-		// 	title: "I am long running!",
-		// 	cancellable: true
-		// }, (progress, token) => {
-		// 	token.onCancellationRequested(() => {
-		// 		console.log("User canceled the long running operation");
-		// 	});
-
-		// 	progress.report({ increment: percent, message: "I am long running! - still going..." });			
-
-
-		// 	var p = new Promise(resolve => {
-		// 		setTimeout(() => {
-		// 			resolve();
-		// 		}, 5000);
-		// 	});
-
-		// 	return p;
-		// });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
-		// vscode.window.showInformationMessage('Generating file. Please wait for the magic...');
-
-
-		// let dialogBar = vscode.window.showInformationMessage('Generating file. Please wait for the magic...');
-
-
-		// let test = new DocumentInfo("awerawer","asdfasdfdsfgdfg"); 
-		// let test = new DocumentInfo(vscode.workspace.textDocuments[0], 
-		// 	new vscode.DocumentSymbol("pepe", "pepe",
-		// 	 vscode.SymbolKind.Boolean, 
-		// 	 new vscode.Range(new vscode.Position(10,10), new vscode.Position(102,102)), new vscode.Range(new vscode.Position(20,20), new vscode.Position(10123,10213))
-		// 	 ));
-		// let p = FindFiles();
-
-
-
-		// let hasFinished:boolean = false;
-
+		
 		progress.report({ increment: 5, message: "Loading configuration..." });
 		
-
 		let config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('godotProjectBreakdown');
-		// let documentsSeparator: string = DocumentInfo.config.get('separator.scripts') as string;
-		// let linesBetweenScripts: number = DocumentInfo.config.get('separator.linesBetweenScripts') as number;
-		// let fileName: string = DocumentInfo.config.get('file.name') as string;
-		// let fileExtension: string = DocumentInfo.config.get('file.extension') as string;
 		let documentsSeparator: string = config.get('separator.scripts') as string;
 		let linesBetweenScripts: number = config.get('separator.linesBetweenScripts') as number;
 		let fileName: string = config.get('file.name') as string;
@@ -285,9 +63,6 @@ export function activate(context: vscode.ExtensionContext) {
 		{
 			fileExtension = "." + fileExtension;
 		}
-		// let filePath: string = DocumentInfo.config.get('file.path') as string;
-		// let overrideFile: boolean = DocumentInfo.config.get('file.override') as boolean;
-		// let scriptsSortType: string = DocumentInfo.config.get('file.sortScriptsBy') as string;
 		let filePath: string = config.get('file.path') as string;
 		let overrideFile: boolean = config.get('file.override') as boolean;
 		let scriptsSortType: string = config.get('file.sortScriptsBy') as string;
@@ -298,178 +73,49 @@ export function activate(context: vscode.ExtensionContext) {
 		// FindFiles();
 		GetDocumentInfoArray()
 		.then(function(documentsArray){			
+			documentsArray = SortDocuments(documentsArray, scriptsSortType);	
 
-			documentsArray = SortDocuments(documentsArray, scriptsSortType);
-
-			// let projectBreakdown = "";
 			let projectBreakdown = GetDocumentHeader([vscode.workspace.rootPath, documentsArray.length]);
-
 
 			if(!overrideFile) 
 			{		
 				fileName = GetUniqueName(fileName);				
 			}
 
-
-
-
-
-
-
-
-
-
-			// vscode.window.withProgress({ title: "Progressive aggressor 1", location: vscode.ProgressLocation.Notification, cancellable: true }, newTask(60, "Es el progreeeeso!!!"));
-			// progress.report({ increment: 10, message: "yuuuuuutube" });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 			progress.report({ increment: 30, message: "Analyzing .gd files" });
 
 			for (let i = 0; i < documentsArray.length; i++) {
 				const doc = documentsArray[i];
 				vscode.window.setStatusBarMessage('Completed: '+ ((i/documentsArray.length)*100).toString());
-				// i++;
-				// console.log(i);
-				// console.log('Completed: '+ ((i/documentsArray.length)*100).toString());
 
 				progress.report({ increment: 40, message: "Analyzing "+doc.GetFileName() });
 
 				let percent = (i/documentsArray.length)*100;
-				// progress.report({ increment: 50, message: "I am long running! - almost there..." });
 
-		
-				// console.log(percent);
-				//aqui
-				// progress.report({ increment: percent, message: "I am long running! - still going..." });			
-		
-		
-					
-					
-					
-					
-					
-					
-					projectBreakdown += doc.PrintDocument();
-					projectBreakdown += documentsSeparator + "\n".repeat(linesBetweenScripts + 1);
-				}//for
-				
-				
-				
-
-
+				projectBreakdown += doc.PrintDocument();
+				projectBreakdown += documentsSeparator + "\n".repeat(linesBetweenScripts + 1);
+			}//for
+											
 			progress.report({ increment: 75, message: "Writing file" });
 			
-
-
-
-
-
-
-
-
-
-
-			// newTask(50, "WOOOOOOOOOOOOOOOOOOOOT!!!!");
-
 			vscode.window.setStatusBarMessage('Writing file...');
 
-			// console.log(documentsArray);
-			// console.log(projectBreakdown);
-			// documentsArray[0].GetInstanceVariables();
-			// documentsArray[0].PrintInstanceVariables();
-			// documentsArray[0].GetMethods();
-			// documentsArray[0].PrintDocument();
-
-
-
-			// let workspaceFolder: string = '';
-			// if (vscode.workspace.workspaceFolders !== undefined) {
-			// 	workspaceFolder = vscode.workspace.workspaceFolders[0].uri.path;
-			// }
-			// const newFile = vscode.Uri.parse('untitled:' + path.join(workspaceFolder, 'safsa.txt'));
-			// console.error("vscode.workspace.rootPath  - " + vscode.workspace.rootPath );
-			// console.error("vscode.workspace.rootPath|| './'  - " + vscode.workspace.rootPath|| "./" );
-			// console.error("vscode.workspace.rootPath|| './' + filePath - " + (vscode.workspace.rootPath|| "./") + filePath );
-			// console.error("filePath - " + filePath );
-			// const newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath || "./", 'file.dat'),true);
-			// const newFile = vscode.Uri.parse('untitled:' + path.join(vscode.workspace.rootPath || "./" + filePath , fileName),true);
-			// const newFile = vscode.Uri.parse(path.join(vscode.workspace.rootPath || "./" + filePath , fileName),true);
-			
-			// NOTE asi estaba originalmente
 			const newFile = vscode.Uri.parse('untitled:' + path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
-
-			// let newFile = vscode.Uri.parse('untitled:' + path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
-			// let newFile = vscode.Uri.file('untitled:' + path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension));
-			// let newFile = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
-
-			// console.log("newFile: " + newFile );
-
 			if (fs.existsSync(newFile.path))
 			{
-				// console.error("EL ARCHIVO YA EXISTE");
-				// // newFile = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
-				// const edit2 = new vscode.WorkspaceEdit();
-				// edit2.deleteFile(newFile);
-				// vscode.workspace.applyEdit(edit2).then(success => {
-				// 	CreateNewDocument(newFile, projectBreakdown);
-				// });
-
 				// console.log("The file exists");
 				var filePath2 = path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension);
 				fs.writeFileSync(filePath2, projectBreakdown, 'utf8');
-				// console.log("After writing");
 
-				const newFilee = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
-				// vscode.window.showTextDocument(newFile);
+				const newFilee = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);				
 				vscode.window.showTextDocument(vscode.Uri.file(newFile.path));
-				// vscode.window.showTextDocument(newFilee);
-				// vscode.window.showInformationMessage("File "+fileName+fileExtension+ " modified!");
-
 				vscode.window.setStatusBarMessage('');
 				progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " modified!" });
 
-
-				hasFinished = true;
-				// var p3 = new Promise(resolve => {
-				// 	setTimeout(() => {
-				// 		// if(hasFinished)
-				// 		resolve();
-				// 		console.log("Resuelvo al final modified p3");
-				// 	}, 9000);
-				// });
-				// return p3;
+				hasFinished = true;				
 			}
 			else
 			{
-				// console.log("The file DONT exists");
-			// console.log("newFile: " + newFile );
-// TODO 
-// HERE
-			// if(overrideFile)
-			// {
-			// 	if(1==1)
-			// 	{
-			// 		if (fs.existsSync(newFile.path))
-			// 		{
-			// 			console.error("EL ARCHIVO YA EXISTE");
-			// 		}
-			// 	}
-			// }
-
-				// NOTE ESTO ORIGNAL
 				vscode.workspace.openTextDocument(newFile).then(document => {
 					const edit = new vscode.WorkspaceEdit();
 					edit.insert(newFile, new vscode.Position(0, 0), projectBreakdown);
@@ -479,51 +125,23 @@ export function activate(context: vscode.ExtensionContext) {
 							// vscode.window.showInformationMessage("File "+fileName+fileExtension+ " created!");
 							progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " created!" });
 							
-
 						} else {
 							vscode.window.showInformationMessage('Error!');
 						}
 						vscode.window.setStatusBarMessage('');
 
 						hasFinished = true;
-						// var p2 = new Promise(resolve => {
-						// 	setTimeout(() => {
-						// 		// if(hasFinished)
-						// 		resolve();
-						// 		console.log("Resuelvo al final created p2");
-						// 	}, 9000);
-						// });
-						// return p2;
 					});
 				});
 
 			}
 
-
-
-
-
-			// documentsArray[0].GetSignals();
-			// documentsArray[0].PrintSignals();
-			// for(const doc of documentsArray)
-			// {
-			// 	doc.Print("");
-			// }
-
-
-			// vscode.window.setStatusBarMessage('');
-
-
-
+			// hasFinished = true;
+			
 		});
 
 
 		// https://stackoverflow.com/questions/43359528/javascript-async-await-not-working
-		// FindFiles().then(() => {
-		// 	test.Print("HEHEHEHEH");
-		// });
-		// test.Print("HEHEHEHEH");
-
 
 
 			// var p = new Promise(resolve => {
@@ -537,25 +155,11 @@ export function activate(context: vscode.ExtensionContext) {
 			// return p;
 
 
-			// var p = new Promise(resolve => {
-			// 	waitForFinished(resolve);
-			// });
-			// return p;
 
-			// return ensureHasFinished();
-			return ensureHasFinished(progress);
+			return ensureHasFinished();
+			// return ensureHasFinished(progress);
 			// return ensureHasFinished(hasFinished);
 
-
-			// var p = new Promise(resolve => {
-			// 	while (!hasFinished) {
-			// 		console.log("IM WAITING...");
-			// 	}
-			// 	setTimeout(() => {					
-			// 		resolve();
-			// 	}, 1000);
-			// });
-			// return p;
 
 
 
@@ -570,7 +174,6 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 
-	// vscode.window.withProgress({ title: "Progressive aggressor 1", location: vscode.ProgressLocation.Notification, cancellable: true }, newTask(100, "FIN!!!!"));
 
 
 
@@ -634,36 +237,62 @@ function v1ensureHasFinished() {
 // }
 
 // https://stackoverflow.com/questions/30505960/use-promise-to-wait-until-polled-condition-is-satisfied
-function ensureHasFinished(progress: vscode.Progress<{ message?: string; increment?: number }>) 
+// function ensureHasFinished(progress: vscode.Progress<{ message?: string; increment?: number }>) 
+// {
+// 	let i = 1;
+// 	let time = 5
+//     return new Promise(function (resolve, reject) {
+//         (function waitForFoo(){
+// 			if (hasFinished) 
+// 			{
+// 				console.log("WAIT "+time+"s to resolve "+i.toString());
+// 				i++;
+// 				progress.report({ increment: i, message: "huevos "+i.toString() });
+// 				progress.report({ increment: 50 });
+
+// 				// let r;
+// 				// setTimeout(()=>{
+// 				let r = setTimeout(()=>{
+// 				// let t = setTimeout(()=>{
+// 					// progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " created!" });
+// 					// resolve(); //finish timeout
+// 					// clearTimeout(t);
+// 					// return resolve();
+
+// 					// r = resolve();
+// 					resolve();
+// 				}, time*1000);
+// 				// return resolve();
+// 				return r;
+// 			}
+//             setTimeout(waitForFoo, 30);
+//         })();
+//         // });
+//     });
+// }
+
+
+// https://stackoverflow.com/questions/30505960/use-promise-to-wait-until-polled-condition-is-satisfied
+function ensureHasFinished() 
 {
-	let i = 1;
+	let time = 5
     return new Promise(function (resolve, reject) {
-        (function waitForFoo(){
+        (function waitForFinish(){
 			if (hasFinished) 
 			{
-				console.log("WAIT 10s to resolve "+i.toString());
-				i++;
-				// progress.report({ increment: i, message: "huevos "+i.toString() });
-				progress.report({ increment: 50 });
-
 				// let r;
 				// setTimeout(()=>{
 				let r = setTimeout(()=>{
-				// let t = setTimeout(()=>{
-					// progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " created!" });
-					// resolve(); //finish timeout
-					// clearTimeout(t);
 					// return resolve();
 
 					// r = resolve();
 					resolve();
-				}, 10000);
+				}, time*1000);
 				// return resolve();
 				return r;
 			}
-            setTimeout(waitForFoo, 30);
-        })();
-        // });
+            setTimeout(waitForFinish, 30);
+        })();        
     });
 }
 
