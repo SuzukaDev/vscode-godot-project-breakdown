@@ -234,8 +234,8 @@ private _text: string;
 
 
         // console.error("\n\n\n\n\n\n\n\n"+this._name+"\n"+noCommentsText);
-        console.error("\n\n\n\n\n\n\n\n"+this._name+"\n");
-        console.log(noCommentsText);
+        // console.error("\n\n\n\n\n\n\n\n"+this._name+"\n");
+        // console.log(noCommentsText);
         return noCommentsText;
     }
 
