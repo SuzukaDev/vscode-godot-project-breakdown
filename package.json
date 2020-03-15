@@ -95,7 +95,7 @@
 				},
 				"godotProjectBreakdown.separator.scripts": {					
 					"type": "string",
-					"default": "==============================================================================",
+					"default": "■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■",
 					"description": "Separation between scripts"
 				},
 				"godotProjectBreakdown.separator.linesBetweenScripts": {					

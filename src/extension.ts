@@ -54,10 +54,10 @@ export function activate(context: vscode.ExtensionContext) {
 		let overrideFile: boolean = config.get('file.override') as boolean;
 		let scriptsSortType: string = config.get('file.sortScriptsBy') as string;
 		
+		progress.report({ increment: 10, message: "Getting .gd files" });
 		
-		progress.report({ increment: 15, message: "Getting .gd files" });
-		
-		GetDocumentInfoArray()
+		// GetDocumentInfoArray()
+		GetDocumentInfoArray(progress)
 		.then(function(documentsArray){			
 			documentsArray = SortDocuments(documentsArray, scriptsSortType);	
 
@@ -68,21 +68,22 @@ export function activate(context: vscode.ExtensionContext) {
 				fileName = GetUniqueName(fileName);				
 			}
 
-			progress.report({ increment: 30, message: "Analyzing .gd files" });
+			// progress.report({ increment: 50, message: "Analyzing .gd files" });
+			progress.report({ increment: 10, message: "Analyzing .gd files" });
 
 			for (let i = 0; i < documentsArray.length; i++) {
 				const doc = documentsArray[i];
 				vscode.window.setStatusBarMessage('Completed: '+ ((i/documentsArray.length)*100).toString());
 
-				progress.report({ increment: 40, message: "Analyzing "+doc.GetFileName() });
-
-				let percent = (i/documentsArray.length)*100;
+				// progress.report({ increment: 50, message: "Analyzing "+doc.GetFileName() });
+				// let percent = (i/documentsArray.length)*100;
 
 				projectBreakdown += doc.PrintDocument();
 				projectBreakdown += documentsSeparator + "\n".repeat(linesBetweenScripts + 1);
 			}//for
-											
-			progress.report({ increment: 75, message: "Writing file" });
+														
+			// progress.report({ increment: 75, message: "Writing file" });
+			progress.report({ increment: 10, message: "Writing file" });			
 			
 			vscode.window.setStatusBarMessage('Writing file...');
 
@@ -97,6 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
 				vscode.window.showTextDocument(vscode.Uri.file(newFile.path));
 				vscode.window.setStatusBarMessage('');
 				progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " modified!" });
+
 			}
 			else
 			{
@@ -108,9 +110,10 @@ export function activate(context: vscode.ExtensionContext) {
 							vscode.window.showTextDocument(document);
 							// vscode.window.showInformationMessage("File "+fileName+fileExtension+ " created!");
 							progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " created!" });
+
 							
-						} else {
-							vscode.window.showInformationMessage('Error!');
+						} else {							
+							vscode.window.showErrorMessage('Error on vscode.workspace.applyEdit(edit)');
 						}
 						vscode.window.setStatusBarMessage('');
 					});
@@ -158,77 +161,6 @@ export function deactivate() {}
 
 
 // https://stackoverflow.com/questions/30505960/use-promise-to-wait-until-polled-condition-is-satisfied
-// function waitForFinished(resolve) {
-//     if (!hasFinished) {
-//         setTimeout(waitForFinished.bind(this, resolve), 30);
-//     } else {
-//         resolve();
-//     }
-// }
-
-
-function v1ensureHasFinished() {
-    return new Promise(function (resolve, reject) {
-        (function waitForFoo(){
-            if (hasFinished) return resolve();
-            setTimeout(waitForFoo, 30);
-        })();
-    });
-}
-
-// https://stackoverflow.com/questions/30505960/use-promise-to-wait-until-polled-condition-is-satisfied
-// function v2GLOBALHASFINISHEDensureHasFinished() {
-//     return new Promise(function (resolve, reject) {
-//         (function waitForFoo(){
-// 			if (hasFinished) 
-// 			{
-// 				console.log("WAIT 5s to resolve");
-// 				setTimeout(()=>{
-// 					return resolve();
-// 				}, 5000);
-// 			}
-//             setTimeout(waitForFoo, 30);
-//         })();
-//     });
-// }
-
-// https://stackoverflow.com/questions/30505960/use-promise-to-wait-until-polled-condition-is-satisfied
-// function ensureHasFinished(progress: vscode.Progress<{ message?: string; increment?: number }>) 
-// {
-// 	let i = 1;
-// 	let time = 5
-//     return new Promise(function (resolve, reject) {
-//         (function waitForFoo(){
-// 			if (hasFinished) 
-// 			{
-// 				console.log("WAIT "+time+"s to resolve "+i.toString());
-// 				i++;
-// 				progress.report({ increment: i, message: "huevos "+i.toString() });
-// 				progress.report({ increment: 50 });
-
-// 				// let r;
-// 				// setTimeout(()=>{
-// 				let r = setTimeout(()=>{
-// 				// let t = setTimeout(()=>{
-// 					// progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " created!" });
-// 					// resolve(); //finish timeout
-// 					// clearTimeout(t);
-// 					// return resolve();
-
-// 					// r = resolve();
-// 					resolve();
-// 				}, time*1000);
-// 				// return resolve();
-// 				return r;
-// 			}
-//             setTimeout(waitForFoo, 30);
-//         })();
-//         // });
-//     });
-// }
-
-
-// https://stackoverflow.com/questions/30505960/use-promise-to-wait-until-polled-condition-is-satisfied
 function EnsureHasFinished() 
 {
 	let time = 5
@@ -254,123 +186,6 @@ function EnsureHasFinished()
 
 
 
-function GetDocumentHeader(params: any[]):string
-{
-
-	let workspace = params[0];
-	let nScripts = params[1];
-	let date = new Date();	
-	let mins = ('0'+date.getMinutes()).slice(-2);
-
-
-	let headerText = "Project Breakdown";	
-	let dateText = date.toLocaleDateString()+"   "+date.getHours() +":"+ mins;
-	let scriptsText = "Total Scripts: "+ nScripts;
-	let offset = 5;
-	let maxSize = Math.max(headerText.length, dateText.length, scriptsText.length, workspace.length) + offset;
-
-	// let prefix = "|";
-	let prefix = "│";
-	// let sufix = "|";
-	let sufix = "│";
-	
-	let centerHeader = CenterString(headerText, maxSize);
-	let centerWorkspace = CenterString(workspace, maxSize);
-	let centerDateText = CenterString(dateText, maxSize);
-	let centerScript = CenterString(scriptsText, maxSize);
-	
-	let min = Math.min(centerDateText.length,centerHeader.length, centerWorkspace.length, centerScript.length);
-	
-
-
-
-
-
-	// return "_".repeat(maxSize)+"\n"+
-	// return " "+"_".repeat(maxSize-1)+"\n"+
-	return "┌─"+"─".repeat(maxSize-2)+"┐\n"+
-	// prefix + CenterString(headerText, maxSize)+sufix+"\n"+
-	// prefix + CenterString(workspace, maxSize)+sufix+"\n"+
-	// prefix + CenterString(dateText, maxSize)+sufix+"\n"+
-	// prefix + CenterString(scriptsText, maxSize)+sufix+"\n"+
-
-	// prefix + centerHeader+sufix+"\n"+
-	// prefix + centerWorkspace+sufix+"\n"+
-	// prefix + centerDateText+sufix+"\n"+
-	// prefix + centerScript+sufix+"\n"+
-
-	// prefix + centerHeader+"\n"+
-	// prefix + centerWorkspace+"\n"+
-	// prefix + centerDateText+"\n"+
-	// prefix + centerScript+"\n"+
-
-	prefix + centerHeader.substring(0,min)+sufix+"\n"+
-	prefix + centerWorkspace.substring(0,min)+sufix+"\n"+
-	prefix + centerDateText.substring(0,min)+sufix+"\n"+
-	prefix + centerScript.substring(0,min)+sufix+"\n"+
-
-
-
-	// prefix + "·".repeat(maxSize)+"\n".repeat(5);
-	// "·".repeat(maxSize)+"\n".repeat(5);
-	// "└"+"·".repeat(maxSize-1)+"┘"+"\n".repeat(5);
-	"└"+"─".repeat(maxSize-1)+"┘"+"\n".repeat(5);
-	// "└"+"■".repeat(maxSize-1)+"┘"+"\n".repeat(5);
-
-
-
-	/*
-┌──────────────────────────────────────────────────────┐
-|                   Project Breakdown                  │
-|  c:\SampleDirectory  │
-|                   10/3/2020   20:19                  │
-|                   Total Scripts: 10                  |
-└──────────────────────────────────────────────────────┘
-┌──────────────────────────────────────────────────────┐
-|                   Project Breakdown                  │
-|  c:\SampleDirectory  │
-|                   10/3/2020   20:19                  │
-|                   Total Scripts: 10                  |
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■┐
-|                   Project Breakdown                  │
-|  c:\SampleDirectory  │
-|                   10/3/2020   20:19                  │
-|                   Total Scripts: 10                  │
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-┌──────────────────────────────────────────────────────┐
-|                   Project Breakdown                  │
-|  c:\SampleDirectory  │
-|                   10/3/2020   20:19                  │
-|                   Total Scripts: 10                  |
-└■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■┘
-┌──────────────────────────────────────────────────────┐
-|                   Project Breakdown                  │
-|  c:\SampleDirectory  │
-|                   10/3/2020   20:19                  │
-|                   Total Scripts: 10                  |
-└■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■┘
- ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
-▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-
-■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
-░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-
-	*/
-
-
-}
-
-
 
 function CenterString(text:string, len:number):string
 {
@@ -385,26 +200,13 @@ function CenterString(text:string, len:number):string
 function GetUniqueName(originalName: string): string
 {
 	let date = new Date();
-	let components = [
-		date.getFullYear(),
-		date.getMonth(),
-		date.getDate(),
-		date.getHours(),
-		date.getMinutes(),
-		date.getSeconds(),
-		date.getMilliseconds()
-	];
-	// let id = components.join("");											
-	// return components.join("");		
-	return originalName + " " + components.join("");				
-
-	// fileName = fileName + " " + id;		
+	let components = [date.getFullYear(), date.getMonth(), date.getDate(), date.getHours(), date.getMinutes(), date.getSeconds(), date.getMilliseconds()];
+	return originalName + " " + components.join("");					
 }
 
 function SortDocuments(documents: DocumentInfo[], sortType: string)
 {
 	documents = documents.sort((a,b)=>{
-
 
 		let aa:string = "";
 		let bb:string = "";
@@ -458,9 +260,11 @@ function CreateNewDocument(fileUri: vscode.Uri, textInDocument:string)
 }
 
 
-
-async function GetDocumentInfoArray() :Promise<DocumentInfo[]>
+// async function GetDocumentInfoArray() :Promise<DocumentInfo[]>
+async function GetDocumentInfoArray(progress: vscode.Progress<{increment: number, message: string}>) :Promise<DocumentInfo[]>
 {	
+	// progress.report({increment:60, message: "kopanitoooo"});
+
 	let documentsInfoArray: DocumentInfo[] = [];	
 	let filesUri: vscode.Uri[] = await vscode.workspace.findFiles('**/*.{gd}');
 
@@ -468,7 +272,19 @@ async function GetDocumentInfoArray() :Promise<DocumentInfo[]>
 	// https://stackoverflow.com/questions/37576685/are-there-any-issues-with-using-async-await-in-a-foreach-loop
 	// filesUri.forEach(async anUri => {
 
+	var i = 0;
+	// https://code.visualstudio.com/api/references/vscode-api#Progress
+	// Each call with a increment value will be SUMMED UP and reflected as overall progress until 100% is reached
+	let incrementValue = 55 / filesUri.length;
+
 	for (const anUri of filesUri) {
+
+		//Progress stuff
+		let fileName = anUri.toString().split("/").pop();				
+		progress.report({increment: incrementValue, message: "Opening "+fileName});
+		console.log(anUri.toString() + "     remap: "+incrementValue);
+		i++;
+
 		const theDocument = await vscode.workspace.openTextDocument(anUri);
 
 		let docSymbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];
@@ -478,3 +294,110 @@ async function GetDocumentInfoArray() :Promise<DocumentInfo[]>
 
 	return documentsInfoArray;
 }
+
+
+function GetDocumentHeader(params: any[]):string
+{
+	let workspace = params[0];
+	let nScripts = params[1];
+	let date = new Date();	
+	let mins = ('0'+date.getMinutes()).slice(-2);
+
+	let headerText = "Project Breakdown";	
+	let dateText = date.toLocaleDateString()+"   "+date.getHours() +":"+ mins;
+	let scriptsText = "Total Scripts: "+ nScripts;
+	let offset = 5;
+	let maxSize = Math.max(headerText.length, dateText.length, scriptsText.length, workspace.length) + offset;
+
+	//|
+	let prefix = "│";	
+	let sufix = "│";
+	
+	let centerHeader = CenterString(headerText, maxSize);
+	let centerWorkspace = CenterString(workspace, maxSize);
+	let centerDateText = CenterString(dateText, maxSize);
+	let centerScript = CenterString(scriptsText, maxSize);
+	
+	let min = Math.min(centerDateText.length,centerHeader.length, centerWorkspace.length, centerScript.length);
+	
+
+	// return "_".repeat(maxSize)+"\n"+
+	// return " "+"_".repeat(maxSize-1)+"\n"+
+	return "┌─"+"─".repeat(maxSize-2)+"┐\n"+
+
+
+	prefix + centerHeader.substring(0,min)+sufix+"\n"+
+	prefix + centerWorkspace.substring(0,min)+sufix+"\n"+
+	prefix + centerDateText.substring(0,min)+sufix+"\n"+
+	prefix + centerScript.substring(0,min)+sufix+"\n"+
+
+
+
+	// prefix + "·".repeat(maxSize)+"\n".repeat(5);
+	// "·".repeat(maxSize)+"\n".repeat(5);
+	// "└"+"·".repeat(maxSize-1)+"┘"+"\n".repeat(5);
+	"└"+"─".repeat(maxSize-1)+"┘"+"\n".repeat(5);
+	// "└"+"■".repeat(maxSize-1)+"┘"+"\n".repeat(5);
+
+
+
+	/*
+	EXAMPLES
+┌──────────────────────────────────────────────────────┐
+|                   Project Breakdown                  │
+|  c:\SampleDirectory                                  │
+|                   10/3/2020   20:19                  │
+|                   Total Scripts: 10                  |
+└──────────────────────────────────────────────────────┘
+
+
+┌──────────────────────────────────────────────────────┐
+|                   Project Breakdown                  │
+|  c:\SampleDirectory                                  │
+|                   10/3/2020   20:19                  │
+|                   Total Scripts: 10                  |
+└──────────────────────────────────────────────────────┘
+────────────────────────────────────────────────────────
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+┌──────────────────────────────────────────────────────┐
+|                   Project Breakdown                  │
+|  c:\SampleDirectory  │
+|                   10/3/2020   20:19                  │
+|                   Total Scripts: 10                  |
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■┐
+|                   Project Breakdown                  │
+|  c:\SampleDirectory  │
+|                   10/3/2020   20:19                  │
+|                   Total Scripts: 10                  │
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+┌──────────────────────────────────────────────────────┐
+|                   Project Breakdown                  │
+|  c:\SampleDirectory  │
+|                   10/3/2020   20:19                  │
+|                   Total Scripts: 10                  |
+└■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■┘
+┌──────────────────────────────────────────────────────┐
+|                   Project Breakdown                  │
+|  c:\SampleDirectory  │
+|                   10/3/2020   20:19                  │
+|                   Total Scripts: 10                  |
+└■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■┘
+ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+	*/
+}
+
