@@ -1,65 +1,51 @@
-# godotProjectBreakdown README
 
-This is the README for your extension "godotProjectBreakdown". After writing up a brief description, we recommend including the following sections.
+# Godot Project Breakdown
+<p align="center">
+	<img width="256" height="256" src="https://github.com/SuzukaDev/vscode-godot-project-breakdown/blob/master/images/icon.png?raw=true">
+</p>
 
-## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+## Overview
+This is an vscode extension that gets all **.gd** files in your project (**works only with .gd**), analyze them and gives a overview of all of them in a single file.
 
-For example if there is an image subfolder under your extension project workspace:
+For each .gd file, it shows its private or public* variables and methods, defined signals and node references.
 
-\!\[feature X\]\(images/feature-x.png\)
+>\* *Private and public fields do not exist (at least at the moment) in gd script, but if you use the prefix "_" to differentiate private fields (using "_") from public (without "_"), it will take it into account.*
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
 
-## Requirements
+## But... Why? For what?
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+I made this extension for myself, to easily track and update every change in my project, so I could easily manage/update my project documentation (in my case, an UML diagram for my game).
+Instead of keeping track of every change manually, I just generate a new file, compare it to the previous version (using version control), 
+and effectively update my documentation.
 
-## Extension Settings
+I released the extension just in case is helpful for somebody else. :four_leaf_clover:
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+## Usage :wrench:
+1. Open command palette (`F1`)
+2. Type **`Generate breakdown file`**
+3. Execute command
+4. Enjoy :dancer: (optional)
+<p align="center">
+	<img width="715" height="588" src="https://github.com/SuzukaDev/vscode-godot-project-breakdown/blob/master/images/demo.gif?raw=true">
+</p>
 
-For example:
 
-This extension contributes the following settings:
+## Possible future improvements
+Analyze all the .tscn files in the project for getting more information, like... signals connected via editor.
 
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+## FAQ 
+##### Why the name of the extension is that bad?
+Because I couldn't think of a better name :D
 
-## Known Issues
+## Logo license
+The extension logo uses and modifies the original logo by Andrea Calabró.
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+Godot Logo (C) Andrea Calabró
+Distributed under the terms of the Creative Commons Attribution License
+version 3.0 (CC-BY 3.0) <https://creativecommons.org/licenses/by/3.0/legalcode>.
 
-## Release Notes
+## Contact
+[@chocoboflo](https://twitter.com/chocoboflo):wolf:
 
-Users appreciate release notes as you update your extension.
 
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
------------------------------------------------------------------------------------------------------------
-
-## Working with Markdown
-
-**Note:** You can author your README using Visual Studio Code.  Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux)
-* Toggle preview (`Shift+CMD+V` on macOS or `Shift+Ctrl+V` on Windows and Linux)
-* Press `Ctrl+Space` (Windows, Linux) or `Cmd+Space` (macOS) to see a list of Markdown snippets
-
-### For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
