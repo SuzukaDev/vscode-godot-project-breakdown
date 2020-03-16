@@ -281,8 +281,7 @@ async function GetDocumentInfoArray(progress: vscode.Progress<{increment: number
 
 		//Progress stuff
 		let fileName = anUri.toString().split("/").pop();				
-		progress.report({increment: incrementValue, message: "Opening "+fileName});
-		console.log(anUri.toString() + "     remap: "+incrementValue);
+		progress.report({increment: incrementValue, message: "Opening "+fileName});	
 		i++;
 
 		const theDocument = await vscode.workspace.openTextDocument(anUri);

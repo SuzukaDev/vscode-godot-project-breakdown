@@ -2,7 +2,7 @@
 	"name": "godotProjectBreakdown",
 	"displayName": "godotProjectBreakdown",
 	"description": "Extension for generating a file containing a breakdown of the project, with all scripts and their variables, methods, signals, node references, etc.",
-	"version": "0.0.1",
+	"version": "1.0.0",
 	"publisher": "SuzukaDev",
     "author": {
         "name": "@chocoboflo"
