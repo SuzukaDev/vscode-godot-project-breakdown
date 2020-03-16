@@ -274,7 +274,7 @@ async function GetDocumentInfoArray(progress: vscode.Progress<{increment: number
 
 	var i = 0;
 	// https://code.visualstudio.com/api/references/vscode-api#Progress
-	// Each call with a increment value will be SUMMED UP and reflected as overall progress until 100% is reached
+	// "Each call with a increment value will be SUMMED UP and reflected as overall progress until 100% is reached"
 	let incrementValue = 55 / filesUri.length;
 
 	for (const anUri of filesUri) {
@@ -400,4 +400,13 @@ function GetDocumentHeader(params: any[]):string
 
 	*/
 }
+
+
+
+
+
+
+
+
+
 
