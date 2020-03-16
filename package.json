@@ -3,6 +3,10 @@
 	"displayName": "godotProjectBreakdown",
 	"description": "Extension for generating a file containing a breakdown of the project, with all scripts and their variables, methods, signals, node references, etc.",
 	"version": "0.0.1",
+	"publisher": "@chocoboflo",
+    "author": {
+        "name": "@chocoboflo"
+    },
 	"repository": {
         "type": "git",
         "url": "https://github.com/SuzukaDev/vscode-godot-project-breakdown"
