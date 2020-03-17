@@ -10,7 +10,7 @@ This is an vscode extension that gets all **.gd** files in your project (**works
 
 For each .gd file, it shows its private or public* variables and methods, defined signals and node references.
 
->\* *Private and public fields do not exist (at least at the moment) in gd script, but if you use the prefix "_" to differentiate private fields (using "_") from public (without "_"), it will take it into account.*
+>\* *Private and public fields do not exist (at least at the moment) in gd script, but if you use the prefix "\_" to differentiate private fields (using "\_") from public (without "\_"), it will take it into account.*
 
 
 ## But... Why? For what?
@@ -39,13 +39,14 @@ Analyze all the .tscn files in the project for getting more information, like...
 Because I couldn't think of a better name :D
 
 ## Logo license
-The extension logo uses and modifies the original logo by Andrea Calabró.
+The extension logo uses and modifies the original Godot logo by Andrea Calabró.
 
+Its License:
 Godot Logo (C) Andrea Calabró
 Distributed under the terms of the Creative Commons Attribution License
 version 3.0 (CC-BY 3.0) <https://creativecommons.org/licenses/by/3.0/legalcode>.
 
 ## Contact
-[@chocoboflo](https://twitter.com/chocoboflo):wolf:
+[@chocoboflo](https://twitter.com/chocoboflo) :wolf:
 
 
