@@ -22,6 +22,7 @@ and effectively update my documentation.
 I released the extension just in case is helpful for somebody else. :four_leaf_clover:
 
 ## Usage :wrench:
+>**Prerequisites**: this extension requires [Godot tools](https://marketplace.visualstudio.com/items?itemName=geequlim.godot-tools)
 1. Open command palette (`F1`)
 2. Type **`Generate breakdown file`**
 3. Execute command
