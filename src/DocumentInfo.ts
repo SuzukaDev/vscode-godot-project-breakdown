@@ -63,8 +63,11 @@ private _text: string;
     // constructor(document: vscode.TextDocument, symbols: vscode.DocumentSymbol, filter, uri: vscode.Uri)
     constructor(document: vscode.TextDocument, symbols: vscode.DocumentSymbol[])
     {
-        this._document = document;                                                    
-        this._symbols = symbols;      
+        this._document = document; 
+        if(symbols != null)                                                   
+            this._symbols = symbols;      
+        else
+            this._symbols = [];
         
         let splitName = this._document.fileName.split("\\");        
         this._name = splitName[splitName.length-1];
