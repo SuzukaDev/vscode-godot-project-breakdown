@@ -15,6 +15,7 @@ enum ScriptElement {
     Methods = "m",
     Path = "p",
     FileName = "f",
+    Enums = "e",
     Space = " "    
 };
 
@@ -35,6 +36,7 @@ static signalsSeparator: string = (DocumentInfo.config.get('separator.signals') 
 static nodesSeparator: string = (DocumentInfo.config.get('separator.nodeReferences') as string) + "\n";
 static variablesSeparator: string = (DocumentInfo.config.get('separator.variables') as string) + "\n";
 static methodsSeparator: string = (DocumentInfo.config.get('separator.methods') as string) + "\n";
+static enumsSeparator: string = (DocumentInfo.config.get('separator.enums') as string) + "\n";
 
 
 
@@ -42,10 +44,12 @@ static separateVariables: boolean = (DocumentInfo.config.get('separator.publicAn
 static separateMethods: boolean = (DocumentInfo.config.get('separator.publicAndPrivateMethods') as boolean);
 
 static showConstants: boolean = (DocumentInfo.config.get('file.showConstants') as boolean);
+static showEnumValues: boolean = (DocumentInfo.config.get('file.showEnumValues') as boolean);
 
 
 //prefixes
 static signalPrefix: string = (DocumentInfo.config.get('prefix.signals') as string);
+static enumPrefix: string = (DocumentInfo.config.get('prefix.enums') as string);
 static nodePrefix: string = (DocumentInfo.config.get('prefix.nodeReferences') as string);
 static variablePrefix: string = (DocumentInfo.config.get('prefix.variables') as string);
 static methodPrefix: string = (DocumentInfo.config.get('prefix.methods') as string);
@@ -72,7 +76,7 @@ private _text: string;
         let splitName = this._document.fileName.split("\\");        
         this._name = splitName[splitName.length-1];
 
-        this._extends = this.FindExtend();
+        // this._extends = this.FindExtend();
 
         // TODO Hacer una variable con el texto SIN COMENTARIOS (hacer un replace)
         //           \s*#.*
@@ -86,10 +90,12 @@ private _text: string;
 
         // TODO checkear si en settings tenemos el bool de ignoreComments
         this._text = this.RemoveCommentsFromText(this._document.getText());
+        this._extends = this.FindExtend();
+
 
 	}
 
-
+    
 
 
 
@@ -245,12 +251,12 @@ private _text: string;
 
     private FindExtend():string
     {
-        let reg = /(?<=extends)(?:\s*)(\S+)/g;
-        // let docText: string = this._document.getText();
+        // let reg = /(?<=extends)(?:\s*)(\S+)/g;
+        let reg = /(?<=extends)(?:\s*)(.*)/;
         let docText: string = this._text;
         let match = reg.exec(docText);
         if(match)
-            return match[0].trim();
+            return match[0];
         else
             return "";
     }
@@ -289,6 +295,52 @@ private _text: string;
     }
 
 
+    private GetEnums(): string[]
+    {
+        let result: string[] = [];
+        let reg = /(?<=enum\s*)(\w*)\s*{(.*?)(?=})/gsm;        
+        let docText: string = this._text;
+
+        let regexp: Array<string> = [];
+        regexp = docText.match(reg) as string[];
+        
+        let match = reg.exec(docText);
+        while (match != null) {
+            let enumName: string = match[1].trim();
+            let enumValues = match[2].replace(/\s*/gms, "").replace(/,/gm, ", ");
+            result.push(enumName+"..."+enumValues);// "..." is a custom separator
+            match = reg.exec(docText);
+        }
+
+        return result;
+    }
+
+    private PrintEnums(): string
+    {
+        let concatenationString = "";
+        let enums: string[] = this.SortAlphabetically( this.GetEnums());       
+
+        if(enums == []){
+            return "";
+        }
+
+        enums.forEach(anEnum => {            
+            let split = anEnum.split("..."); // "..." is the separator between the name and the values
+            let enumName = split[0];
+            let valuesString = "";
+            if(DocumentInfo.showEnumValues)
+            {
+                let enumValues = split[1];
+                valuesString = " ["+enumValues+"]"
+            }
+
+            concatenationString += DocumentInfo.enumPrefix + 
+                enumName + valuesString
+                "\n";
+        });
+
+        return concatenationString;
+    }
     
     private GetConstants(): string[]
     {
@@ -425,6 +477,10 @@ private _text: string;
             case ScriptElement.Variables:
                 text = this.PrintInstanceVariables();
                 separatorText = DocumentInfo.variablesSeparator;
+                break;
+            case ScriptElement.Enums:
+                text = this.PrintEnums();
+                separatorText = DocumentInfo.enumsSeparator;
                 break;
             case ScriptElement.Space:
                 text = "\n";                

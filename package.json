@@ -2,7 +2,7 @@
 	"name": "godotProjectBreakdown",
 	"displayName": "godotProjectBreakdown",
 	"description": "Extension for generating a file containing a breakdown of the project, with all scripts and their variables, methods, signals, node references, etc.",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"publisher": "SuzukaDev",
     "author": {
         "name": "@chocoboflo"
@@ -41,8 +41,8 @@
 
 				"godotProjectBreakdown.file.order": {					
 					"type": "string",
-					"default": "fp nsvm",
-					"description": "The order of the document:\nn - Node references\ns - Signals\nv - Variables\nm - Methods\np - Path of the file\nf - File Name\n(Empty space) - Line separation (\\n)"
+					"default": "fp ne svm",
+					"description": "The order of the document:\nn - Node references\ns - Signals\nv - Variables\nm - Methods\np - Path of the file\nf - File Name\ne - Enums\n(Empty space) - Line separation (\\n)"
 				},
 				"godotProjectBreakdown.file.sortScriptsBy": {					
 					"type": "string",
@@ -81,6 +81,16 @@
 					"type": "boolean",
 					"default": "true",
 					"description": "If true, shows the constants with the variables"
+				},				
+				"godotProjectBreakdown.file.showEnumValues": {					
+					"type": "boolean",
+					"default": "true",
+					"description": "If true, shows the values for each enum"
+				},				
+				"godotProjectBreakdown.file.ignoreFolders": {					
+					"type": "string",
+					"default": "/addons/**",
+					"description": "Glob Pattern for ignoring folders"
 				},
 
 
@@ -90,6 +100,11 @@
 					"type": "string",
 					"default": "· · · · · · · · · Nodes · · · · · · · · · · · ",
 					"description": "Text/separation printed before the referenced nodes"
+				},
+				"godotProjectBreakdown.separator.enums": {					
+					"type": "string",
+					"default": "-  -  -  -  -  -  Enums -  -  -  -  -  -  - ",
+					"description": "Text/separation printed before the enums"
 				},
 				"godotProjectBreakdown.separator.signals": {					
 					"type": "string",
@@ -113,12 +128,11 @@
 				},
 				"godotProjectBreakdown.separator.linesBetweenScripts": {					
 					"type": "number",
-					"default": 3, 
+					"default": 6, 
 					"minimum": 0,
 					"maximum": 50,
 					"description": "Lines of separation between scripts in the generated file."
 				},
-
 				"godotProjectBreakdown.separator.publicAndPrivateVariables": {					
 					"type": "boolean",
 					"default": "true",
@@ -129,13 +143,19 @@
 					"default": "true",
 					"description": "Adds a space between public and private methods"
 				},
-
 				"godotProjectBreakdown.prefix.signals": {					
 					"type": "string",
 					"default": "s: ", 
 					"minimum": 0,
 					"maximum": 50,
 					"description": "Prefix used for each signal"
+				},
+				"godotProjectBreakdown.prefix.enums": {					
+					"type": "string",
+					"default": "enum: ", 
+					"minimum": 0,
+					"maximum": 50,
+					"description": "Prefix used for each enum"
 				},
 				"godotProjectBreakdown.prefix.nodeReferences": {					
 					"type": "string",

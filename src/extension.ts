@@ -27,8 +27,8 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.withProgress({
 			location: vscode.ProgressLocation.Notification,
 			title: "[GodotProjectBreakdown]",
-			// cancellable: true
-			cancellable: false
+			cancellable: true
+			// cancellable: false
 		}, (progress, token) => {
 			token.onCancellationRequested(() => {
 				console.log("User canceled the long running operation");
@@ -266,7 +266,11 @@ async function GetDocumentInfoArray(progress: vscode.Progress<{increment: number
 	// progress.report({increment:60, message: "kopanitoooo"});
 
 	let documentsInfoArray: DocumentInfo[] = [];	
-	let filesUri: vscode.Uri[] = await vscode.workspace.findFiles('**/*.{gd}');
+	let excludeFolders = vscode.workspace.getConfiguration('godotProjectBreakdown').get('file.ignoreFolders') as string;
+	// https://code.visualstudio.com/api/references/vscode-api
+	// https://code.visualstudio.com/api/references/vscode-api#GlobPattern
+	// https://globster.xyz
+	let filesUri: vscode.Uri[] = await vscode.workspace.findFiles('**/*.{gd}',excludeFolders);
 
 	// Problem with foreach loop and async!
 	// https://stackoverflow.com/questions/37576685/are-there-any-issues-with-using-async-await-in-a-foreach-loop
