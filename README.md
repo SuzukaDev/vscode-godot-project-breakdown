@@ -24,6 +24,8 @@ I released the extension just in case is helpful for somebody else. :four_leaf_c
 >**Prerequisites**: this extension requires [Godot tools](https://marketplace.visualstudio.com/items?itemName=geequlim.godot-tools)
 
 1. [Download latest version](https://github.com/SuzukaDev/vscode-godot-project-breakdown/releases) and install it
+>:bangbang:If you are using a Godot Tools version below 1.X.X, [download version 1.0.1](https://github.com/SuzukaDev/vscode-godot-project-breakdown/releases/tag/v1.0.1)<br>
+If you are using Godot 3.2 or above and a Godot tools version equal or above 1.X.X [download latest version](https://github.com/SuzukaDev/vscode-godot-project-breakdown/releases)
 2. Open command palette (<kbd>F1</kbd>)
 3. Type **`Generate breakdown file`**
 4. Execute command

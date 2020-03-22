@@ -31,14 +31,15 @@ export function activate(context: vscode.ExtensionContext) {
 			// cancellable: false
 		}, (progress, token) => {
 			token.onCancellationRequested(() => {
-				console.log("User canceled the long running operation");
+				console.log("Godot Project Breakdown was canceled");
 				hasFinished = true;
 				// return;
 			});
 
 		hasFinished = false;
 
-		
+		CheckGodotToolsVersion();
+
 		progress.report({ increment: 5, message: "Loading configuration..." });
 		
 		let config: vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration('godotProjectBreakdown');
@@ -58,7 +59,7 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		// GetDocumentInfoArray()
 		GetDocumentInfoArray(progress)
-		.then(function(documentsArray){			
+		.then(function(documentsArray){	
 			documentsArray = SortDocuments(documentsArray, scriptsSortType);	
 
 			let projectBreakdown = GetDocumentHeader([vscode.workspace.rootPath, documentsArray.length]);
@@ -87,39 +88,45 @@ export function activate(context: vscode.ExtensionContext) {
 			
 			vscode.window.setStatusBarMessage('Writing file...');
 
-			const newFile = vscode.Uri.parse('untitled:' + path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
-			if (fs.existsSync(newFile.path))
+			//for not creating and showing the file when is cancelled
+			if(!hasFinished)
 			{
-				// console.log("The file exists");
-				var filePath2 = path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension);
-				fs.writeFileSync(filePath2, projectBreakdown, 'utf8');
+				const newFile = vscode.Uri.parse('untitled:' + path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);
+				
+				if (fs.existsSync(newFile.path))
+				{
+					// console.log("The file exists");
+					var filePath2 = path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension);
+					fs.writeFileSync(filePath2, projectBreakdown, 'utf8');
 
-				const newFilee = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);				
-				vscode.window.showTextDocument(vscode.Uri.file(newFile.path));
-				vscode.window.setStatusBarMessage('');
-				progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " modified!" });
+					const newFilee = vscode.Uri.parse(path.join((vscode.workspace.rootPath || "./") + filePath , fileName+fileExtension),true);				
+					vscode.window.showTextDocument(vscode.Uri.file(newFile.path));
+					vscode.window.setStatusBarMessage('');
+					progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " modified!" });
 
-			}
-			else
-			{
-				vscode.workspace.openTextDocument(newFile).then(document => {
-					const edit = new vscode.WorkspaceEdit();
-					edit.insert(newFile, new vscode.Position(0, 0), projectBreakdown);
-					return vscode.workspace.applyEdit(edit).then(success => {
-						if (success) {
-							vscode.window.showTextDocument(document);
-							// vscode.window.showInformationMessage("File "+fileName+fileExtension+ " created!");
-							progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " created!" });
+				}
+				else
+				{
+					vscode.workspace.openTextDocument(newFile).then(document => {
+						const edit = new vscode.WorkspaceEdit();
+						edit.insert(newFile, new vscode.Position(0, 0), projectBreakdown);
+						return vscode.workspace.applyEdit(edit).then(success => {
+							if (success) {
+								vscode.window.showTextDocument(document);
+								// vscode.window.showInformationMessage("File "+fileName+fileExtension+ " created!");
+								progress.report({ increment: 100, message: "File "+fileName+fileExtension+ " created!" });
 
-							
-						} else {							
-							vscode.window.showErrorMessage('Error on vscode.workspace.applyEdit(edit)');
-						}
-						vscode.window.setStatusBarMessage('');
+								
+							} else {							
+								vscode.window.showErrorMessage('Error on vscode.workspace.applyEdit(edit)');
+							}
+							vscode.window.setStatusBarMessage('');
+						});
 					});
-				});
 
+				}
 			}
+			
 
 			hasFinished = true;
 			
@@ -259,6 +266,16 @@ function CreateNewDocument(fileUri: vscode.Uri, textInDocument:string)
 	});
 }
 
+function CheckGodotToolsVersion(): void
+{
+	let gtVersion = vscode.extensions.getExtension("geequlim.godot-tools")?.packageJSON.version.toString().split(".")[0] as number;
+	if(gtVersion<1)
+	{
+		let errorMsg = "You are using Godot tools version "  + vscode.extensions.getExtension("geequlim.godot-tools")?.packageJSON.version.toString() + " (below 1.X.X). Extension won't work as expected.\nUpdate to Godot tools 1.X.X (or above) or download a Godot Project Breakdown version 1.X.X"
+		vscode.window.showErrorMessage(errorMsg);
+		console.error(errorMsg);
+	}
+}
 
 // async function GetDocumentInfoArray() :Promise<DocumentInfo[]>
 async function GetDocumentInfoArray(progress: vscode.Progress<{increment: number, message: string}>) :Promise<DocumentInfo[]>
@@ -281,6 +298,9 @@ async function GetDocumentInfoArray(progress: vscode.Progress<{increment: number
 	// "Each call with a increment value will be SUMMED UP and reflected as overall progress until 100% is reached"
 	let incrementValue = 55 / filesUri.length;
 
+	let gtVersion = vscode.extensions.getExtension("geequlim.godot-tools")?.packageJSON.version.toString().split(".")[0] as number;
+
+
 	for (const anUri of filesUri) {
 
 		//Progress stuff
@@ -290,8 +310,37 @@ async function GetDocumentInfoArray(progress: vscode.Progress<{increment: number
 
 		const theDocument = await vscode.workspace.openTextDocument(anUri);
 
-		let docSymbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];
-		let docInfo: DocumentInfo = new DocumentInfo(theDocument, docSymbols);
+		let docSymbols = await vscode.commands.executeCommand<vscode.DocumentSymbol[]>('vscode.executeDocumentSymbolProvider', theDocument.uri) as vscode.DocumentSymbol[];		
+ 
+		let docInfo:DocumentInfo;
+		
+
+		
+		//Code chunk originally created for support all godot-tools versions
+		if(gtVersion >= 1)
+		{
+			// When using Godot tools version 1.0.0 and above, symbolKind must be offseted +1
+			let offsetedSymbols = docSymbols[0].children;
+			offsetedSymbols.forEach(symb => {
+				symb.kind += 1;
+			});
+			docInfo = new DocumentInfo(theDocument, offsetedSymbols);			
+		}
+		else //if its a version below 1.x.x (0.x.x) (symbolKinds remains the same)
+		{
+			docInfo = new DocumentInfo(theDocument, docSymbols); //original (Godot tools version below 1.0.0)
+		}
+		
+
+		// let offsetedSymbols = docSymbols[0].children;
+		// 	offsetedSymbols.forEach(symb => {
+		// 		symb.kind += 1;
+		// 	});
+		// docInfo = new DocumentInfo(theDocument, offsetedSymbols);
+
+
+
+
 		documentsInfoArray.push(docInfo);
 	}
 

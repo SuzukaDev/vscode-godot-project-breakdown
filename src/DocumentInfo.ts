@@ -370,16 +370,17 @@ private _text: string;
     private GetInstanceVariables(): string[]
     {
         let variables: string[] = [];
-        
+
         for(const symb of this._symbols){
             if(symb.kind == vscode.SymbolKind.Variable)
             {
                 variables.push(symb.name);
             }
-            else if(symb.kind == vscode.SymbolKind.Function)
-            {
-                break;
-            }            
+            // godot tools below 1.x.x
+            // else if(symb.kind == vscode.SymbolKind.Function)
+            // {
+            //     break;
+            // }            
         }
         return variables;
     }
