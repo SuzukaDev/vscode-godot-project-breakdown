@@ -89,7 +89,7 @@
 				},				
 				"godotProjectBreakdown.file.ignoreFolders": {					
 					"type": "string",
-					"default": "/addons/**",
+					"default": "**/addons/**",
 					"description": "Glob Pattern for ignoring folders"
 				},
 

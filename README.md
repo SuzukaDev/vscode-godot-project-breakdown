@@ -67,7 +67,7 @@ Allows you to add a custom prefix for each property.
 ### `godotProjectBreakdown.file.ignoreFolders`
 A [Glob Pattern](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) for ignoring folders/files that you don't want to show in the breakdown file.
 
-Its default value is `"/addons/**"`, wich means that will ignore files on the addons folder.
+Its default value is `"**/addons/**"`, wich means that will ignore files on anny "addons" folder.
 > If [Glob Patterns](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) are new to you, [this tool](https://globster.xyz) is very useful to ensure your glob pattern is correct :dog:
 
 ### `godotProjectBreakdown.file.showEnumValues`
