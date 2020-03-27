@@ -6,11 +6,32 @@
 import * as vscode from 'vscode';
 import { workspace, window } from 'vscode';
 
+/* NOTE 
+The problem of making different separators without being asociated to a field (signals, vars, methods, etc)
+is that they will always be printed, no matter if the fields they preceed are EMPTY.
+
+Per example:
+s1 = separator1 = "------ This is a separator example for signals -----"
+s1s v -> this wil print the separator1, the signals, space, and then the variables
+
+if s is empty (there is no signals), it will print the separator and then the signals.
+I would be confusing:
+
+------ This is a separator example for signals -----
+
+var1
+var2Example
+var3
+
+
+*/
+// TODO hacer lo de los prefijos
 
 
 enum ScriptElement {
     NodeReferences = "n",
     Signals = "s",
+    // ConnectedSignals = "c", //NOTE
     Variables = "v",
     Methods = "m",
     Path = "p",
@@ -117,7 +138,15 @@ private _text: string;
 
     public PrintDocument():string
     {
-        let documentBreakdown = "";        
+        let documentBreakdown = "";
+        // if(this._symbols == [])
+        if(!this._symbols[0])
+        {
+            let msg = "### WARNING: Symbols are null on '"+this._name+"' (Path: "+this._document.uri.path+")\n";
+            console.warn(msg+ ". This COULD be due because there is an error on that file or the file is empty.");
+            // console.error(msg);
+            documentBreakdown += msg;
+        }
         DocumentInfo.documentOrder.split("").forEach(c => {            
             documentBreakdown += this.GetTextFrom(c as ScriptElement);
         });
@@ -292,6 +321,40 @@ private _text: string;
         });
 
         return concatenationString;
+    }
+
+    private GetConnectedSignals(): string[]
+    {
+        let reg = /(?<=connect\s*\()\s*.*(?=\))/g;
+        let docText: string = this._text;
+        let regexp: Array<string> = [];
+        regexp = docText.match(reg) as string[];
+        return regexp;   
+    }
+
+    private PrintConnectedSignals(): string
+    {
+        let concatenationString = "";
+        let connectedSignals: string[] = this.SortAlphabetically( this.GetConnectedSignals());
+
+        if(connectedSignals == []){
+            return "";
+        }
+
+        connectedSignals.forEach(aConnectedSignal => {
+            let signalSplit = aConnectedSignal.replace(/['"\s]/g, "").split(",");
+            let signalName = signalSplit[0];
+            let targetNode = signalSplit[1];
+            let func = signalSplit[2];
+            // concatenationString += DocumentInfo.signalPrefix + 
+            // TODO Add custom prefix?
+            concatenationString += "CONNECTED SIGNAL:" + 
+                signalName + " on "+targetNode + " ("+func+")"
+                "\n";
+        });
+
+        return concatenationString;
+
     }
 
 

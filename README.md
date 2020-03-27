@@ -83,6 +83,11 @@ A `bool` for showing (true) or not (false) the enum values for each enum.
 ##### Why the name of the extension is that bad?
 Because I couldn't think of a better name :D
 
+
+TODO añadir aqui el mensaje de warning
+### WARNING
+decir que qué pasa si lo ves en un archivo
+
 ## Logo license :copyright:
 The extension logo uses and modifies the original Godot logo by Andrea Calabró.
 

@@ -1,6 +1,12 @@
 # Change Log 
 Godot Project Breakdown
 
+### Added
+- Now is possible to look for connected signals via code.
+### Fixed
+- If you executed the extension on a project with an empty file, or a file with an error, that caused to freeze the extension.
+Now, instead of that, it just prints a warning for that specific file, to warn you that maybe there is something wrong with it.
+
 ## 2.0.0
 22/3/2020<br>
 I made the extension using Godot 3.1 & Godot Tools 0.3.X. Current Godot Tools versions (1.X.X) changes the some things with the symbols and added more functionality, so I've updated the extension to work with latest Godot Tools versions.

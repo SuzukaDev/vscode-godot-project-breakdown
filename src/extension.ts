@@ -314,10 +314,15 @@ async function GetDocumentInfoArray(progress: vscode.Progress<{increment: number
  
 		let docInfo:DocumentInfo;
 		
-
+		// TODO hacer que si no hay docSymbols, los ponga a Null. Y al imprimir, chequea que son null y no hace nada
 		
+		if(docSymbols == null)
+		{
+			console.error("docSymbols es null en: "+fileName);
+		}
+
 		//Code chunk originally created for support all godot-tools versions
-		if(gtVersion >= 1)
+		if(gtVersion >= 1 && docSymbols != null)
 		{
 			// When using Godot tools version 1.0.0 and above, symbolKind must be offseted +1
 			let offsetedSymbols = docSymbols[0].children;
