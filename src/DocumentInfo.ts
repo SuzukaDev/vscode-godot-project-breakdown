@@ -70,6 +70,7 @@ static showMethodArguments: boolean = (DocumentInfo.config.get('file.showMethodA
 
 
 //prefixes
+// TODO CAMBIAR ESTO
 static signalPrefix: string = (DocumentInfo.config.get('prefix.signals') as string);
 static enumPrefix: string = (DocumentInfo.config.get('prefix.enums') as string);
 static nodePrefix: string = (DocumentInfo.config.get('prefix.nodeReferences') as string);
