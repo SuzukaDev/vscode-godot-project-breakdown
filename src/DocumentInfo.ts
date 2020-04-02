@@ -66,6 +66,7 @@ static separateMethods: boolean = (DocumentInfo.config.get('separator.publicAndP
 
 static showConstants: boolean = (DocumentInfo.config.get('file.showConstants') as boolean);
 static showEnumValues: boolean = (DocumentInfo.config.get('file.showEnumValues') as boolean);
+static showMethodArguments: boolean = (DocumentInfo.config.get('file.showMethodArguments') as boolean);
 
 
 //prefixes
@@ -479,12 +480,47 @@ private _text: string;
         let methods: string[] = [];
         for(const symb of this._symbols){
             if(symb.kind == vscode.SymbolKind.Function)
-            {
-                methods.push(symb.name.replace(/\s/g, ""));
-            }       
+            {                
+                let args:string = DocumentInfo.showMethodArguments? "(" + this.GetMethodArguments(symb) + ")" : "";                
+
+                methods.push(symb.name.replace(/\s/g, "") + args);
+            }     
         }
         return methods;
     }
+
+    //Lastest godot tools wasn't showing the args for the methods, so this is the fix:
+    private GetMethodArguments(symb:vscode.DocumentSymbol):string
+    {
+        // let methodLine = symb.range._start._line;
+        let methodLine = symb.range.start.line;
+        let result = "";
+        for (let i = 0; i < symb.children.length; i++) {
+            const child = symb.children[i];
+            let childLine = child.range.start.line;
+            if(childLine != methodLine)
+            {
+                break;
+            }            
+            
+            result += " " + child.name + ",";
+            
+        }        
+
+        if(result != "")
+        {
+            if(result[0] == " ")
+            {
+                result = result.substring(1);            
+            }
+            if(result[result.length - 1] == ",")
+            {
+                result = result.substring(0, result.length - 1);
+            }
+        }
+        return result;
+    }
+
     private PrintMethods(): string
     {
         let concatenationString = "";        

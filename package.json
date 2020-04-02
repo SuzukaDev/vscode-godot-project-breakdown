@@ -74,19 +74,24 @@
 				},
 				"godotProjectBreakdown.file.override": {					
 					"type": "boolean",
-					"default": "true",
+					"default": true,
 					"description": "If false, generates an unique name and avoids orverwriting a previous file."
 				},
 				"godotProjectBreakdown.file.showConstants": {					
 					"type": "boolean",
-					"default": "true",
+					"default": true,
 					"description": "If true, shows the constants with the variables"
 				},				
 				"godotProjectBreakdown.file.showEnumValues": {					
 					"type": "boolean",
-					"default": "true",
+					"default": true,
 					"description": "If true, shows the values for each enum"
-				},				
+				},
+				"godotProjectBreakdown.file.showMethodArguments": {					
+					"type": "boolean",
+					"default": true,
+					"description": "If true, shows the arguments for each method (not only the name)"
+				},			
 				"godotProjectBreakdown.file.ignoreFolders": {					
 					"type": "string",
 					"default": "**/addons/**",
@@ -135,12 +140,12 @@
 				},
 				"godotProjectBreakdown.separator.publicAndPrivateVariables": {					
 					"type": "boolean",
-					"default": "true",
+					"default": true,
 					"description": "Adds a space between public and private variables"
 				},
 				"godotProjectBreakdown.separator.publicAndPrivateMethods": {					
 					"type": "boolean",
-					"default": "true",
+					"default": true,
 					"description": "Adds a space between public and private methods"
 				},
 				"godotProjectBreakdown.prefix.signals": {					
