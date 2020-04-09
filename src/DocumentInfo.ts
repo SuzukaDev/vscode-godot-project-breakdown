@@ -5,6 +5,7 @@
 
 import * as vscode from 'vscode';
 import { workspace, window } from 'vscode';
+import { Script } from 'vm';
 
 /* NOTE 
 The problem of making different separators without being asociated to a field (signals, vars, methods, etc)
@@ -26,12 +27,12 @@ var3
 
 */
 // TODO hacer lo de los prefijos
-
+const prefixSeparator: string = ">";
 
 enum ScriptElement {
     NodeReferences = "n",
     Signals = "s",
-    // ConnectedSignals = "c", //NOTE
+    ConnectedSignals = "c", //NOTE
     Variables = "v",
     Methods = "m",
     Path = "p",
@@ -54,6 +55,7 @@ static config: vscode.WorkspaceConfiguration = workspace.getConfiguration('godot
 static documentOrder: string = (DocumentInfo.config.get('file.order') as string);
 //Separators
 static signalsSeparator: string = (DocumentInfo.config.get('separator.signals') as string) + "\n";
+static connectedSignalsSeparator: string = (DocumentInfo.config.get('separator.connectedSignals') as string) + "\n";
 static nodesSeparator: string = (DocumentInfo.config.get('separator.nodeReferences') as string) + "\n";
 static variablesSeparator: string = (DocumentInfo.config.get('separator.variables') as string) + "\n";
 static methodsSeparator: string = (DocumentInfo.config.get('separator.methods') as string) + "\n";
@@ -68,15 +70,69 @@ static showConstants: boolean = (DocumentInfo.config.get('file.showConstants') a
 static showEnumValues: boolean = (DocumentInfo.config.get('file.showEnumValues') as boolean);
 static showMethodArguments: boolean = (DocumentInfo.config.get('file.showMethodArguments') as boolean);
 
-
-//prefixes
 // TODO CAMBIAR ESTO
+//prefixes
 static signalPrefix: string = (DocumentInfo.config.get('prefix.signals') as string);
 static enumPrefix: string = (DocumentInfo.config.get('prefix.enums') as string);
 static nodePrefix: string = (DocumentInfo.config.get('prefix.nodeReferences') as string);
 static variablePrefix: string = (DocumentInfo.config.get('prefix.variables') as string);
 static methodPrefix: string = (DocumentInfo.config.get('prefix.methods') as string);
 static constantPrefix: string = (DocumentInfo.config.get('prefix.constants') as string);
+
+
+// https://stackoverflow.com/questions/54297376/getting-the-enum-key-with-the-value-string-reverse-mapping-in-typescript
+// private getEnumKeyByEnumValue(myEnum:ScriptElement, enumValue:string) {
+// private getEnumKeyByEnumValue(enumValue:string) {
+//     // let keys = Object.keys(myEnum).filter(x => myEnum[x] == enumValue);
+//     let keys = Object.keys(ScriptElement).filter(x => ScriptElement[x] == enumValue);
+//     return keys.length > 0 ? keys[0] : null;
+// }
+
+private GetElementFromDocumentOrder(enumValue:ScriptElement): string{
+    // https://stackoverflow.com/questions/39372804/typescript-how-to-loop-through-enum-values-for-display-in-radio-buttons
+    // https://stackoverflow.com/questions/18111657/how-to-get-names-of-enum-entries
+    // https://stackoverflow.com/questions/48276105/get-typescript-enum-name-from-instance
+    // let enumKey = Object.keys(ScriptElement).find(key => ScriptElement[key] === enumValue);
+    // console.log(Object.keys(ScriptElement).find(key => ScriptElement[key] === enumValue));
+    // console.log(ScriptElement[enumValue]);
+    // let val = Object.keys(ScriptElement).find(k => k === enumValue);
+    let vals = Object.values(ScriptElement);
+    console.error("VAL: "+vals);
+    // for (const e in ScriptElement) {
+    // for (const e in Object.values(ScriptElement)) {
+    for (const e in vals) {
+        // if (ScriptElement.hasOwnProperty(e)) {
+        if (1==1) {
+            // console.error(ScriptElement[ScriptElement.e]);
+            // console.log("enum: "+e+ "enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: "+ ScriptElement[enumValue]);
+            // console.log("enum: "+e+ "enum.valueOf: "+ScriptElement.valueOf(e)+ " enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: " );
+            console.log("vals[e]= "+vals[e] + " enum: "+e+ " enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: " );
+            // console.log(Object.keys(ScriptElement).map(k => ScriptElement[k]).filter(v => typeof v === "number")
+
+            let index:number = parseInt(e);
+            // if(e==enumValue)
+            if(vals[e]==enumValue)
+            // if(ScriptElement[e:number]==enumValue)
+            // if(ScriptElement[index]==enumValue)
+            {
+                console.error("ES IGUAL! --> "+e);
+            }
+            
+        }
+    }
+    return "";
+}
+private GetPrefix(enumValue:ScriptElement): string{
+
+    /*
+    Divide documentOrder en separator (,)
+    EXPRESIONES REGULERAS! DINAMICAS
+    */ 
+
+    DocumentInfo.documentOrder
+    //si el length del split es solo 1, eso es que no hay prefix (devuelve "")
+    return "";
+}
 
 
 // https://github.com/qrti/funcList/blob/master/src/functionsDocument.ts
@@ -90,6 +146,12 @@ private _text: string;
     // constructor(document: vscode.TextDocument, symbols: vscode.DocumentSymbol, filter, uri: vscode.Uri)
     constructor(document: vscode.TextDocument, symbols: vscode.DocumentSymbol[])
     {
+
+        console.error("TEST");
+        this.GetElementFromDocumentOrder(ScriptElement.ConnectedSignals);
+
+
+
         this._document = document; 
         if(symbols != null)                                                   
             this._symbols = symbols;      
@@ -327,11 +389,36 @@ private _text: string;
 
     private GetConnectedSignals(): string[]
     {
-        let reg = /(?<=connect\s*\()\s*.*(?=\))/g;
+        // let reg = /(?<=connect\s*\()\s*.*(?=\))/g;
+        let reg = /(?:(\w*)\.)?(?:connect\s*\()(.*)\)/g;
         let docText: string = this._text;
         let regexp: Array<string> = [];
-        regexp = docText.match(reg) as string[];
-        return regexp;   
+        // regexp = docText.match(reg) as string[];
+        // return regexp;   
+
+        let results:string[] = [];
+
+        let match = reg.exec(docText);
+        while (match != null) {
+            let node:string = match[1]?  match[1] : "self";
+            let signalSplit = match[2].replace(/\s/g,"").split(",");
+
+            let signalName = signalSplit[0];
+            let targetNode = signalSplit[1];
+            let func = signalSplit[2];
+
+            // let str = signalName + " ("+ node + "), function: " + func + " (" + targetNode + ")";
+            let str = `${signalName} (${node}), function: ${func} (${targetNode})`;
+
+            results.push(str);
+            match = reg.exec(docText);
+
+            // let enumName: string = match[1].trim();
+            // let enumValues = match[2].replace(/\s*/gms, "").replace(/,/gm, ", ");
+        }
+
+        return results;
+
     }
 
     private PrintConnectedSignals(): string
@@ -343,16 +430,21 @@ private _text: string;
             return "";
         }
 
+        // connectedSignals.forEach(aConnectedSignal => {
+        //     let signalSplit = aConnectedSignal.replace(/['"\s]/g, "").split(",");
+        //     let signalName = signalSplit[0];
+        //     let targetNode = signalSplit[1];
+        //     let func = signalSplit[2];
+        //     // concatenationString += DocumentInfo.signalPrefix + 
+        //     // TODO Add custom prefix?
+        //     concatenationString += "CONNECTED SIGNAL: " + 
+        //         signalName + " on "+targetNode + " ("+func+")"
+        //         "\n";
+        // });
         connectedSignals.forEach(aConnectedSignal => {
-            let signalSplit = aConnectedSignal.replace(/['"\s]/g, "").split(",");
-            let signalName = signalSplit[0];
-            let targetNode = signalSplit[1];
-            let func = signalSplit[2];
             // concatenationString += DocumentInfo.signalPrefix + 
             // TODO Add custom prefix?
-            concatenationString += "CONNECTED SIGNAL:" + 
-                signalName + " on "+targetNode + " ("+func+")"
-                "\n";
+            concatenationString += aConnectedSignal + "\n";
         });
 
         return concatenationString;
@@ -400,8 +492,7 @@ private _text: string;
             }
 
             concatenationString += DocumentInfo.enumPrefix + 
-                enumName + valuesString
-                "\n";
+                enumName + valuesString + "\n";
         });
 
         return concatenationString;
@@ -571,8 +662,15 @@ private _text: string;
             case ScriptElement.Path:
                 text = "Path: "+ this._document.fileName + "\n";
                 break;
+            case ScriptElement.ConnectedSignals:
+                //TODO separador conected signals           
+                text = this.PrintConnectedSignals();                                
+                separatorText = DocumentInfo.connectedSignalsSeparator;                                        
+                // separatorText = "¿¿¿¿¿¿¿¿¿¿¿¿¿CONNECTED SIGNALS?????????????\n";                                        
+
+                break;
             case ScriptElement.Signals:
-                text = this.PrintSignals();                                
+                text = this.PrintSignals();                     
                 separatorText = DocumentInfo.signalsSeparator;                                        
                 break;
             case ScriptElement.Variables:

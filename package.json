@@ -41,7 +41,7 @@
 
 				"godotProjectBreakdown.file.order": {					
 					"type": "string",
-					"default": "fp ne svm",
+					"default": "fp nec svm",
 					"description": "The order of the document:\nn - Node references\ns - Signals\nv - Variables\nm - Methods\np - Path of the file\nf - File Name\ne - Enums\n(Empty space) - Line separation (\\n)"
 				},
 				"godotProjectBreakdown.file.sortScriptsBy": {					
@@ -115,6 +115,11 @@
 					"type": "string",
 					"default": "- - - - - - - - - Signals - - - - - - - - - - ",
 					"description": "Text/separation printed before the signals"
+				},
+				"godotProjectBreakdown.separator.connectedSignals": {					
+					"type": "string",
+					"default": "- - - - - - - Connected Signals - - - - - - - ",
+					"description": "Text/separation printed before the connected signals"
 				},
 				"godotProjectBreakdown.separator.variables": {					
 					"type": "string",
