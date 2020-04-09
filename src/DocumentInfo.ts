@@ -5,7 +5,7 @@
 
 import * as vscode from 'vscode';
 import { workspace, window } from 'vscode';
-import { Script } from 'vm';
+// import { Script } from 'vm';
 
 /* NOTE 
 The problem of making different separators without being asociated to a field (signals, vars, methods, etc)
@@ -53,6 +53,7 @@ export class DocumentInfo //https://stackoverflow.com/questions/47876790/how-to-
 static config: vscode.WorkspaceConfiguration = workspace.getConfiguration('godotProjectBreakdown');
 
 static documentOrder: string = (DocumentInfo.config.get('file.order') as string);
+// static documentOrderClean: string = DocumentInfo.RemovePrefixes(DocumentInfo.documentOrder);
 //Separators
 static signalsSeparator: string = (DocumentInfo.config.get('separator.signals') as string) + "\n";
 static connectedSignalsSeparator: string = (DocumentInfo.config.get('separator.connectedSignals') as string) + "\n";
@@ -70,8 +71,8 @@ static showConstants: boolean = (DocumentInfo.config.get('file.showConstants') a
 static showEnumValues: boolean = (DocumentInfo.config.get('file.showEnumValues') as boolean);
 static showMethodArguments: boolean = (DocumentInfo.config.get('file.showMethodArguments') as boolean);
 
-// TODO CAMBIAR ESTO
-//prefixes
+
+//prefixes //NOTE maybe change this
 static signalPrefix: string = (DocumentInfo.config.get('prefix.signals') as string);
 static enumPrefix: string = (DocumentInfo.config.get('prefix.enums') as string);
 static nodePrefix: string = (DocumentInfo.config.get('prefix.nodeReferences') as string);
@@ -80,59 +81,7 @@ static methodPrefix: string = (DocumentInfo.config.get('prefix.methods') as stri
 static constantPrefix: string = (DocumentInfo.config.get('prefix.constants') as string);
 
 
-// https://stackoverflow.com/questions/54297376/getting-the-enum-key-with-the-value-string-reverse-mapping-in-typescript
-// private getEnumKeyByEnumValue(myEnum:ScriptElement, enumValue:string) {
-// private getEnumKeyByEnumValue(enumValue:string) {
-//     // let keys = Object.keys(myEnum).filter(x => myEnum[x] == enumValue);
-//     let keys = Object.keys(ScriptElement).filter(x => ScriptElement[x] == enumValue);
-//     return keys.length > 0 ? keys[0] : null;
-// }
 
-private GetElementFromDocumentOrder(enumValue:ScriptElement): string{
-    // https://stackoverflow.com/questions/39372804/typescript-how-to-loop-through-enum-values-for-display-in-radio-buttons
-    // https://stackoverflow.com/questions/18111657/how-to-get-names-of-enum-entries
-    // https://stackoverflow.com/questions/48276105/get-typescript-enum-name-from-instance
-    // let enumKey = Object.keys(ScriptElement).find(key => ScriptElement[key] === enumValue);
-    // console.log(Object.keys(ScriptElement).find(key => ScriptElement[key] === enumValue));
-    // console.log(ScriptElement[enumValue]);
-    // let val = Object.keys(ScriptElement).find(k => k === enumValue);
-    let vals = Object.values(ScriptElement);
-    console.error("VAL: "+vals);
-    // for (const e in ScriptElement) {
-    // for (const e in Object.values(ScriptElement)) {
-    for (const e in vals) {
-        // if (ScriptElement.hasOwnProperty(e)) {
-        if (1==1) {
-            // console.error(ScriptElement[ScriptElement.e]);
-            // console.log("enum: "+e+ "enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: "+ ScriptElement[enumValue]);
-            // console.log("enum: "+e+ "enum.valueOf: "+ScriptElement.valueOf(e)+ " enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: " );
-            console.log("vals[e]= "+vals[e] + " enum: "+e+ " enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: " );
-            // console.log(Object.keys(ScriptElement).map(k => ScriptElement[k]).filter(v => typeof v === "number")
-
-            let index:number = parseInt(e);
-            // if(e==enumValue)
-            if(vals[e]==enumValue)
-            // if(ScriptElement[e:number]==enumValue)
-            // if(ScriptElement[index]==enumValue)
-            {
-                console.error("ES IGUAL! --> "+e);
-            }
-            
-        }
-    }
-    return "";
-}
-private GetPrefix(enumValue:ScriptElement): string{
-
-    /*
-    Divide documentOrder en separator (,)
-    EXPRESIONES REGULERAS! DINAMICAS
-    */ 
-
-    DocumentInfo.documentOrder
-    //si el length del split es solo 1, eso es que no hay prefix (devuelve "")
-    return "";
-}
 
 
 // https://github.com/qrti/funcList/blob/master/src/functionsDocument.ts
@@ -146,12 +95,6 @@ private _text: string;
     // constructor(document: vscode.TextDocument, symbols: vscode.DocumentSymbol, filter, uri: vscode.Uri)
     constructor(document: vscode.TextDocument, symbols: vscode.DocumentSymbol[])
     {
-
-        console.error("TEST");
-        this.GetElementFromDocumentOrder(ScriptElement.ConnectedSignals);
-
-
-
         this._document = document; 
         if(symbols != null)                                                   
             this._symbols = symbols;      
@@ -161,27 +104,81 @@ private _text: string;
         let splitName = this._document.fileName.split("\\");        
         this._name = splitName[splitName.length-1];
 
-        // this._extends = this.FindExtend();
-
-        // TODO Hacer una variable con el texto SIN COMENTARIOS (hacer un replace)
-        //           \s*#.*
-        //Elimina lineas que empiecen por # (incluso si están tabuladas)
-        //HERE MEJOR ESTE
-        // (?<!["']\s*)\s*#.*(?!["'])
-        // str.replace(/(?<!["']\s*)\s*#.*(?!["'])/g, "");
-
-        //   (?<=""")(.*)(?=""")
-        // Elimina comentarios en una sola linea (entre """ """)
-
         // TODO checkear si en settings tenemos el bool de ignoreComments
         this._text = this.RemoveCommentsFromText(this._document.getText());
         this._extends = this.FindExtend();
-
-
 	}
 
     
+    /*
+    private zGetElementFromDocumentOrder(enumValue:ScriptElement): string{
+        // https://stackoverflow.com/questions/39372804/typescript-how-to-loop-through-enum-values-for-display-in-radio-buttons
+        // https://stackoverflow.com/questions/18111657/how-to-get-names-of-enum-entries
+        // https://stackoverflow.com/questions/48276105/get-typescript-enum-name-from-instance
+        // let enumKey = Object.keys(ScriptElement).find(key => ScriptElement[key] === enumValue);
+        // console.log(Object.keys(ScriptElement).find(key => ScriptElement[key] === enumValue));
+        // console.log(ScriptElement[enumValue]);
+        // let val = Object.keys(ScriptElement).find(k => k === enumValue);
+        let vals = Object.values(ScriptElement);
+        console.error("VAL: "+vals);
+        // for (const e in ScriptElement) {
+        // for (const e in Object.values(ScriptElement)) {
+        for (const e in vals) {
+            // if (ScriptElement.hasOwnProperty(e)) {
+            if (1==1) {
+                // console.error(ScriptElement[ScriptElement.e]);
+                // console.log("enum: "+e+ "enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: "+ ScriptElement[enumValue]);
+                // console.log("enum: "+e+ "enum.valueOf: "+ScriptElement.valueOf(e)+ " enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: " );
+                console.log("vals[e]= "+vals[e] + " enum: "+e+ " enum.toString(): "+e.toString()+ "    arg Enum = "+enumValue + "     enumName: " );
+                // console.log(Object.keys(ScriptElement).map(k => ScriptElement[k]).filter(v => typeof v === "number")
 
+                let index:number = parseInt(e);
+                // if(e==enumValue)
+                if(vals[e]==enumValue)
+                // if(ScriptElement[e:number]==enumValue)
+                // if(ScriptElement[index]==enumValue)
+                {
+                    console.error("ES IGUAL! --> "+e);
+                }
+                
+            }
+        }
+        return "";
+    }
+
+    private GetElementFromDocumentOrder(enumValue:ScriptElement): string{
+        let pattern1 = ',?([^,]*)';
+        let pattern2 = ',?';
+        let reg = new RegExp(pattern1 + enumValue + pattern2);
+
+        let text = DocumentInfo.documentOrder;
+        let result = text.match(reg);
+        if(result)
+        {
+            let res = result[0].replace(/,/g,"");
+            return res;
+        }
+        else{
+                return "";
+        }
+    }
+
+    private GetPrefix(enumValue:ScriptElement): string{
+        let element = this.GetElementFromDocumentOrder(enumValue);
+        let split = element.split(prefixSeparator);
+        return split.length == 1? "" : split[0];   
+    }
+
+    private static RemovePrefixes(text:string): string
+    {
+        // let reg = new RegExp('(?:,)?([^,]*)' + prefixSeparator + '(?:,)?');        
+
+        // https://regex101.com/r/7KA7ba/8
+        // (?<=,?)([^, ]*)>(?:,)?        
+        let reg = new RegExp('(?<=,?)([^, ]*)' + prefixSeparator + '(?:,)?');        
+        return text.replace(reg,"");
+    }
+    */
 
 
     public GetFileName(): string
