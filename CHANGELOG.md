@@ -1,14 +1,16 @@
 # Change Log 
 Godot Project Breakdown
 
+## 2.0.1
+9/4/2020
 ### Added
 - Possibility for looking connected signals via code.
 - Option for showing or not the arguments on methods
 ### Fixed
-- Bug when initializing booleans on package.json
+- Solved bug when initializing booleans on package.json
 - If you executed the extension on a project with an empty file, or a file with an error, that caused to freeze the extension.
 Now, instead of that, it just prints a warning for that specific file, to warn you that maybe there is something wrong with it.
-- Showing arguments on methods
+- Showing arguments on methods (they were missing with Godot Tools 1.0.X)
 
 ## 2.0.0
 22/3/2020<br>
