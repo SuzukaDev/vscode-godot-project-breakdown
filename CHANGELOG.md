@@ -1,5 +1,25 @@
 # Change Log 
 Godot Project Breakdown
+## 3.2.0
+7/5/2020
+### Added
+- **Class comments** <br>
+It's possible to show a description, notes or whatever you need to show in the file for each class.<br>
+Just type the text you want to show in between `###\` and `/###`. For example:<br>
+`###\ (Yor comment here) /###`
+<br>
+<br>
+**NOTE**: This will only show the first occurrence of text bewtween the ###\ and /###. In case of be more than one, it will show the first one.
+
+- **Snippet** for adding class comments easily.<br>
+Just type "##" to show the snippet.
+### Fixed
+- Bug when getting node references that were not between " or '. Like, for example: `get_node(PathsReference.input_text)`
+- Bug when getting the node that calls the `connect()` function when looking for connected signals on complex calls like:
+Like, for example: `get_node(AFunctionThatReturnsANode()).connect("a_signal", self, "_OnASignal")` <br>
+Previously it returned `self`, instead of `get_node(AFunctionThatReturnsANode())`
+
+
 
 ## 2.0.1
 9/4/2020

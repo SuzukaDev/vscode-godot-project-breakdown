@@ -2,10 +2,10 @@
 	"name": "godotProjectBreakdown",
 	"displayName": "godotProjectBreakdown",
 	"description": "Extension for generating a file containing a breakdown of the project, with all scripts and their variables, methods, signals, node references, etc.",
-	"version": "2.0.1",
+	"version": "3.2.0",
 	"publisher": "SuzukaDev",
     "author": {
-        "name": "@chocoboflo"
+        "name": "@SuzukaDev"
     },
 	"repository": {
         "type": "git",
@@ -27,7 +27,13 @@
 	],
 	"main": "./out/extension.js",
 	"extensionDependencies": ["geequlim.godot-tools"],
-	"contributes": {
+	"contributes": {		
+		"snippets": [
+			{
+				"language": "gdscript",
+				"path": "src/snippets.json"
+			}
+		],
 		"commands": [
 			{
 				"command": "extension.godotProjectBreakdown",
@@ -41,8 +47,8 @@
 
 				"godotProjectBreakdown.file.order": {					
 					"type": "string",
-					"default": "fp nec svm",
-					"description": "The order of the document:\nn - Node references\ns - Signals\nv - Variables\nm - Methods\np - Path of the file\nf - File Name\ne - Enums\n(Empty space) - Line separation (\\n)"
+					"default": "f# p nec svm",
+					"description": "The order of the document:\nn - Node references\ns - Signals\nv - Variables\nm - Methods\np - Path of the file\nf - File Name\ne - Enums\n(Empty space) - Line separation (\\n)\n# - Class Comment"
 				},
 				"godotProjectBreakdown.file.sortScriptsBy": {					
 					"type": "string",

@@ -38,7 +38,8 @@ enum ScriptElement {
     Path = "p",
     FileName = "f",
     Enums = "e",
-    Space = " "    
+    Space = " ",
+    ClassComment = "#"
 };
 
 // class DocumentInfo implements vscode.TextDocumentContentProvider   
@@ -350,6 +351,16 @@ private _text: string;
         else
             return "";
     }
+
+    private GetClassComment():string
+    {
+        let reg = /(?<=###\\)(.)*?(?=\/###)/ms;
+        let textWithComments:string = this._document.getText()
+        let match = reg.exec(textWithComments);
+
+        // return reg.exec(textWithComments)!=""?:"";
+        return match != null? match[0] + "\n":"";
+    }
     
 
     private GetSignals(): Array<string>
@@ -387,7 +398,8 @@ private _text: string;
     private GetConnectedSignals(): string[]
     {
         // let reg = /(?<=connect\s*\()\s*.*(?=\))/g;
-        let reg = /(?:(\w*)\.)?(?:connect\s*\()(.*)\)/g;
+        // let reg = /(?:(\w*)\.)?(?:connect\s*\()(.*)\)/g;
+        let reg = /(?:(.*)\.)?(?:connect\s*\()(.*)\)/g;
         let docText: string = this._text;
         let regexp: Array<string> = [];
         // regexp = docText.match(reg) as string[];
@@ -678,6 +690,9 @@ private _text: string;
                 text = this.PrintEnums();
                 separatorText = DocumentInfo.enumsSeparator;
                 break;
+            case ScriptElement.ClassComment:
+                text = this.GetClassComment();                
+                break;
             case ScriptElement.Space:
                 text = "\n";                
                 break;
@@ -705,7 +720,13 @@ private _text: string;
         // (?<=get_node\s*\(\s*["'])[^"'.]*
         // let reg = /(?<=get_node\s*\(\s*["'])[^"'.]*/gm; //Dont use the dot! (for things like ""../NodeName")
         // let reg = /(?<=get_node\s*\(\s*["'])[^"']*/gm;
-        let reg = /(?<=get_node\s*\(\s*["'])[^"']*/gm;
+        // let reg = /(?<=get_node\s*\(\s*["'])[^"']*/gm;
+        let reg = /(?<=get_node\s*\(\s*).*(?=\))/gm;
+
+
+        // SERIA ESTO:
+        // (?<=get_node\s*\(\s*).*(?=\))
+
 
         // let docText: string = this._document.getText();
         let docText: string = this._text;

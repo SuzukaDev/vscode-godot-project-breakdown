@@ -46,7 +46,7 @@ You can specify wich data to show, in wich order, and how.
 Most options are self explanatory with its setting's description. But **some** of them:
 
 ### `godotProjectBreakdown.file.order`
-This is one of the most important settings. Is a `string` that specifies the data to show and the order. Its default value is `fp ne svm`
+This is one of the most important settings. Is a `string` that specifies the data to show and the order. Its default value is `f# p ne svm`
 
 
 >Each character stands for a data in file:
@@ -57,6 +57,8 @@ This is one of the most important settings. Is a `string` that specifies the dat
 `p` - Path of the file<br>
 `f` - File Name<br>
 `e` - Enums<br>
+`#` - Class Comments. On any gdscript, you can put the text you want to show in the file if you include it between `###\` and `/###`. For example:
+`###\ (Yor comment here) /###`<br>
 `(Empty space)` - Line separation (equals to \\n)<br>
 ### `godotProjectBreakdown.file.sortScriptsBy`
 Allows you to sort the scripts by their path, name or extended node/script.
@@ -83,11 +85,6 @@ A `bool` for showing (true) or not (false) the enum values for each enum.
 ##### Why the name of the extension is that bad?
 Because I couldn't think of a better name :D
 
-
-TODO añadir aqui el mensaje de warning
-### WARNING
-decir que qué pasa si lo ves en un archivo
-
 ## Logo license :copyright:
 The extension logo uses and modifies the original Godot logo by Andrea Calabró.
 
@@ -97,6 +94,6 @@ Distributed under the terms of the Creative Commons Attribution License
 version 3.0 (CC-BY 3.0) <https://creativecommons.org/licenses/by/3.0/legalcode>.
 
 ## Contact :dog:
-[@chocoboflo](https://twitter.com/chocoboflo) :wolf:
+[@SuzukaDev](https://twitter.com/SuzukaDev) :wolf:
 
 
