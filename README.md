@@ -26,15 +26,12 @@ I released the extension just in case is helpful for somebody else. :four_leaf_c
 1. [Download latest version](https://github.com/SuzukaDev/vscode-godot-project-breakdown/releases) and install it
 >:bangbang:If you are using a Godot Tools version below 1.X.X, [download version 1.0.1](https://github.com/SuzukaDev/vscode-godot-project-breakdown/releases/tag/v1.0.1)<br>
 If you are using Godot 3.2 or above and a Godot tools version equal or above 1.X.X [download latest version](https://github.com/SuzukaDev/vscode-godot-project-breakdown/releases)
-
-1. 1 To install the **.vsix** files, go to `extensions -> ... -> "Install from vsix"`
-<p align="center">
-	<img width="614" height="485" src="https://github.com/SuzukaDev/vscode-godot-project-breakdown/blob/master/images/how_to_install_vsix.gif?raw=true">
-</p>
-2. Open command palette (<kbd>F1</kbd>)
-3. Type **`Generate breakdown file`**
-4. Execute command
-5. Enjoy :dancer: (optional)
+2. To install the **.vsix** files, go to `extensions -> ... -> "Install from vsix"`
+	<img align="center" width="614" height="485" src="https://github.com/SuzukaDev/vscode-godot-project-breakdown/blob/master/images/how_to_install_vsix.gif?raw=true">
+3. Open command palette (<kbd>F1</kbd>)<br>
+4. Type `Generate breakdown file`<br>
+5. Execute command <br>
+6. Enjoy :dancer: (optional)<br>
 <p align="center">
 	<img width="715" height="588" src="https://github.com/SuzukaDev/vscode-godot-project-breakdown/blob/master/images/demo.gif?raw=true">
 </p>
