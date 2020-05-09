@@ -409,7 +409,7 @@ private _text: string;
 
         let match = reg.exec(docText);
         while (match != null) {
-            let node:string = match[1]?  match[1] : "self";
+            let node:string = match[1]?  match[1].replace(/\s/g,"") : "self";
             let signalSplit = match[2].replace(/\s/g,"").split(",");
 
             let signalName = signalSplit[0];
@@ -708,7 +708,22 @@ private _text: string;
         return "";
     }
 
-    
+    private GetTextBetweenParentheses(text:string):string
+    {
+        // text = text.replace(/get_element\s*\(/,"");
+        let counter = 1;
+        let charCounter = 0
+        let charArray = text.split("");        
+        do {
+            let c = charArray[charCounter]
+            if(c=="(")
+                counter++;
+            else if(c==")")
+                counter--;
+            charCounter++;
+        } while (counter > 0 && charCounter<charArray.length);   
+        return text.substr(0,charCounter-1);
+    }
 
     private GetNodeReferences(): string[]
     {
@@ -742,8 +757,14 @@ private _text: string;
             // console.log("get_node: "+match[1]);
             // console.log("get_node: "+match[0]);
 
-            // result.push(match[1]);
-            result.push(match[0]);
+            
+            // result.push(match[0]);
+
+            // If the text contains a ")" means that get_node is being called in a "more complex" line of code, like, for example -> get_node(PathsReference.character_list).connect("pre_text_added_on_list", self, "_OnTextPreAddedOnList") ----- wich makes it return until the last ), so we need to extract only the text between the get_node parentheses:
+            let node = match[0].includes(")")? this.GetTextBetweenParentheses(match[0]) : match[0];
+            // result.push(match[0]);
+            // result.push(this.GetTextBetweenParentheses(match[0]));
+            result.push(node);
             match = reg.exec(docText);
         }
         

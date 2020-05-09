@@ -1,0 +1,9 @@
+{
+    "Class Comment": {
+    "prefix": "##",
+    "body": [
+        "###\\ ${1:Class Comment} /###"
+    ],
+    "description": "Creates Class Comment"
+    }
+}

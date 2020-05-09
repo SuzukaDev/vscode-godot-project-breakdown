@@ -1,5 +1,13 @@
 # Change Log 
 Godot Project Breakdown
+## 3.2.1
+9/5/2020
+### Fixed
+- Bug showing spaces on connected nodes.
+- Bug on node references.
+- Bug with the snippets
+
+
 ## 3.2.0
 7/5/2020
 ### Added

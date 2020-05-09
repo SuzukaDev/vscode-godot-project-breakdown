@@ -2,7 +2,7 @@
 	"name": "godotProjectBreakdown",
 	"displayName": "Godot Project Breakdown",
 	"description": "Extension for generating a file containing a breakdown of the project, with all scripts and their variables, methods, signals, node references, etc.",
-	"version": "3.2.0",
+	"version": "3.2.1",
 	"publisher": "SuzukaDev",
     "author": {
         "name": "@SuzukaDev"
@@ -31,7 +31,7 @@
 		"snippets": [
 			{
 				"language": "gdscript",
-				"path": "src/snippets.json"
+				"path": "./snippets.json"
 			}
 		],
 		"commands": [
