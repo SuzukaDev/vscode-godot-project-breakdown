@@ -91,6 +91,9 @@ Distributed under the terms of the Creative Commons Attribution License
 version 3.0 (CC-BY 3.0) <https://creativecommons.org/licenses/by/3.0/legalcode>.
 
 ## Contact :dog:
-[@SuzukaDev](https://twitter.com/SuzukaDev) :wolf:
+
+suzukakadev@gmail.com
+
+[@SuzukaKDev](https://x.com/SuzukaKDev) :wolf:
 
 
