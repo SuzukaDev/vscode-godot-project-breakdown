@@ -92,8 +92,10 @@ version 3.0 (CC-BY 3.0) <https://creativecommons.org/licenses/by/3.0/legalcode>.
 
 ## Contact :dog:
 
-suzukakadev@gmail.com
+Web: [suzukadev.github.io](https://suzukadev.github.io)
 
-[@SuzukaKDev](https://x.com/SuzukaKDev) :wolf:
+Mail: suzukakadev@gmail.com
+
+Twitter: [@SuzukaKDev](https://x.com/SuzukaKDev) :wolf:
 
 
